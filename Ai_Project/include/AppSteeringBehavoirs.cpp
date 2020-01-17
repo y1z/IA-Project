@@ -3,7 +3,8 @@
 #include "CVector2D.h"
 #include "helper.h"
 
-bool AppSteeringBehaviors::init()
+bool
+AppSteeringBehaviors::init()
 {
   m_boids.emplace_back();
   m_boids[0].loadSprite("../resources/sprites/S_flee.png");
@@ -17,7 +18,8 @@ bool AppSteeringBehaviors::init()
   return true;
 }
 
-int AppSteeringBehaviors::run()
+int
+AppSteeringBehaviors::run()
 {
   while (mptr_window->isOpen())
   {
