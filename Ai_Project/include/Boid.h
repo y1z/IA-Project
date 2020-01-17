@@ -12,17 +12,27 @@ public:
 public:
   void
     loadSprite(const std::string& pathToSprite);
+
   /**
   *  @returns : the current value that represent the speed 
   */
   float 
     getSpeed() const;
 
+  /**
+  *  @returns : the current value that represent the acceleration
+  */
   float
     getAcceleration()const;
 
+  /**
+  *  @returns : the current value that represent the mass
+  */
   float
     getMass()const;
+
+  void
+    setPosition(float x, float y);
 
   void
     setSpeed(float newSpeed);

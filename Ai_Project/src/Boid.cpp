@@ -43,6 +43,13 @@ Boid::getMass() const
   return m_mass;
 }
 
+void 
+Boid::setPosition(float x, float y)
+{
+  m_position.X = x;
+  m_position.Y = y;
+}
+
 void
 Boid::setSpeed(float newSpeed)
 {
@@ -70,4 +77,17 @@ Boid::seek(const enVector2& myPos,
   PathToTarget.NormalizeSelf();
   PathToTarget *= desiredMagnitude;
   return  PathToTarget;
+}
+
+enVector2
+Boid::flee(const enVector2& myPos,
+  const enVector2& TargetPos,
+  float desiredMagnitude,
+  float desiredDistance)
+{
+  if ((myPos - TargetPos).Magnitude() <= desiredDistance) {
+    return  Boid::seek(myPos, TargetPos, desiredMagnitude) * -1.0f;
+  }
+
+  return enVector2(enVector2::zeroVector);
 }

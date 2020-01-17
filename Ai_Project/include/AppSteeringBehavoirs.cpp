@@ -8,11 +8,12 @@ AppSteeringBehaviors::init()
 {
   m_boids.emplace_back();
   m_boids[0].loadSprite("../resources/sprites/S_flee.png");
+  m_boids[0].setPosition(1000, 1000);
 
   sfHelp::Resize(m_boids[0].m_sprite, 35u, 25u);
 
-  mptr_target = new enVector2(200, 200);
-  mptr_window = new sf::RenderWindow(sf::VideoMode(2000, 2000), " Boids behaviors ") ;
+  mptr_target = new enVector2(2000, 200);
+  mptr_window = new sf::RenderWindow(sf::VideoMode(2000, 2000), " Boids behaviors ");
   mptr_timer = new Timer();
 
   return true;
@@ -30,15 +31,31 @@ AppSteeringBehaviors::run()
       if (event.type == sf::Event::Closed)
         mptr_window->close();
 
-      if (event.type == sf::Event::KeyPressed) 
+      if (event.type == sf::Event::KeyPressed)
       {
-        if(event.key.code == sf::Keyboard::Num1)
+        if (event.key.code == sf::Keyboard::Num1)
         {
-          
+          mptr_target->setValues(0u, 0u);
+        }
+        if (event.key.code == sf::Keyboard::Num2)
+        {
+          mptr_target->setValues(mptr_window->getSize().x, mptr_window->getSize().y);
+        }
+
+        if (event.key.code == sf::Keyboard::Num3)
+        {
+          mptr_target->setValues(mptr_window->getSize().x * 0.5f, mptr_window->getSize().y * 0.5f);
         }
       }
+
+      if (event.type == sf::Event::MouseButtonPressed) {
+
+        sf::Vector2i position = sf::Mouse::getPosition(*mptr_window);
+
+        mptr_target->setValues(position.x, position.y);
+      }
     }
-   m_boids[0].m_position += Boid::seek(m_boids[0].m_position, *mptr_target, 1.0f ) * mptr_timer->GetResultSecondsFloat() * m_boids[0].getSpeed();
+    m_boids[0].m_position += Boid::flee(m_boids[0].m_position, *mptr_target, 1.0f) * mptr_timer->GetResultSecondsFloat() * m_boids[0].getSpeed();
 
     mptr_window->clear();
     m_boids[0].m_sprite.setPosition(m_boids[0].m_position.X, m_boids[0].m_position.Y);
@@ -51,7 +68,7 @@ AppSteeringBehaviors::run()
   return 0;
 }
 
-void 
+void
 AppSteeringBehaviors::destroy()
 {
   if (mptr_target != nullptr) {
