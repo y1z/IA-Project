@@ -35,7 +35,7 @@ public:
 private:
   std::vector<Boid> m_boids;
 
-  enVector2* mptr_target = nullptr;
+  Boid* mptr_target = nullptr;
   sf::RenderWindow* mptr_window = nullptr;
   Timer* mptr_timer = nullptr;
 };

@@ -11,6 +11,13 @@ Boid::Boid()
 {
 }
 
+Boid::Boid(float x, float y)
+  :Boid()
+{
+  m_position.X = x;
+  m_position.Y = y;
+}
+
 void
 Boid::loadSprite(const std::string& pathToSprite)
 {
@@ -23,6 +30,20 @@ Boid::loadSprite(const std::string& pathToSprite)
     m_sprite.setTexture(m_texture);
   }
 
+}
+
+void
+Boid::update()
+{
+  if (!(m_position == m_prevPosition)) {
+    m_prevPosition = m_position;
+  }
+}
+
+enVector2
+Boid::getDir() const
+{
+  return (m_position - m_prevPosition).NormalizeReturn();
 }
 
 float
@@ -43,7 +64,7 @@ Boid::getMass() const
   return m_mass;
 }
 
-void 
+void
 Boid::setPosition(float x, float y)
 {
   m_position.X = x;
@@ -91,3 +112,43 @@ Boid::flee(const enVector2& myPos,
 
   return enVector2(enVector2::zeroVector);
 }
+
+enVector2
+Boid::pursue(const enVector2& myPos,
+  const Boid& Target,
+  float desiredMagnitude,
+  float deltaTime)
+
+{
+  enVector2 newTargetPosition = Target.getDir() * Target.getSpeed() * deltaTime;
+
+  return  Boid::seek(myPos, newTargetPosition, desiredMagnitude); //enVector2();
+}
+
+enVector2
+Boid::evade(const enVector2& myPos,
+  const Boid& Target,
+  float desiredMagnitude,
+  float deltaTime,
+  float desiredDistance)
+{
+  enVector2 newTargetPosition = Target.getDir() * Target.getSpeed() * deltaTime;
+
+  return Boid::flee(myPos, newTargetPosition, desiredMagnitude, desiredDistance);
+}
+
+enVector2
+Boid::arrival(const enVector2& myPos,
+  const enVector2& TargetPos,
+  float desiredMagnitude,
+  float radius)
+{
+  const float difference = (TargetPos - myPos).Magnitude();
+
+  if (difference >= radius) {
+    return Boid::seek(myPos, TargetPos, desiredMagnitude);
+  }
+
+  return Boid::seek(myPos,TargetPos,desiredMagnitude) * (difference / radius)  ;
+}
+

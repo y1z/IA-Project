@@ -7,16 +7,26 @@ class Boid
 {
 public:
   Boid();
+  Boid(float x, float y);
   ~Boid() = default;
 
 public:
   void
     loadSprite(const std::string& pathToSprite);
 
+  void
+    update();
+
   /**
-  *  @returns : the current value that represent the speed 
+  *  @returns :the direction of the boid.
   */
-  float 
+  enVector2
+    getDir()const;
+
+  /**
+  *  @returns : the current value that represent the speed
+  */
+  float
     getSpeed() const;
 
   /**
@@ -30,23 +40,46 @@ public:
   */
   float
     getMass()const;
-
+/**
+* @brief : set the position of the boid
+*/
   void
     setPosition(float x, float y);
 
+/**
+* @brief : changes the speed of the boid
+* @param newSpeed [in] : the new speed for the boid
+*/
   void
     setSpeed(float newSpeed);
 
+/**
+* @brief : changes the speed of the boid
+* @param newSpeed [in] : the new speed for the boid
+*/
   void
     setAcceleration(float newAccelration);
 
+/**
+* @brief : changes the mass of the boid
+* @param newSpeed [in] : the new mass for the boid
+*/
   void
     setMass(float newMass);
 public:
 
+/**
+* @brief : changes the mass of the boid
+* @param newSpeed [in] : the new mass for the boid
+*/
   static enVector2 seek(const enVector2& myPos,
     const enVector2& TargetPos,
     float desiredMagnitude);
+
+/**
+* @brief : changes the mass of the boid
+* @param newSpeed [in] : the new mass for the boid
+*/
 
   static enVector2 flee(const enVector2& myPos,
     const enVector2& TargetPos,
@@ -55,17 +88,17 @@ public:
 
 
   static enVector2 pursue(const enVector2& myPos,
-    const enVector2& TargetPos,
+    const Boid& Target,
     float desiredMagnitude,
-    float desiredDistance = 100.0f,
-    float predictionTime = 0.10f);
+    float deltaTime);
 
 
   static enVector2 evade(const enVector2& myPos,
-    const enVector2& TargetPos,
+    const Boid& Target,
     float desiredMagnitude,
-    float desiredDistance = 100.0f,
-    float predictionTime = 0.10f);
+    float deltaTime,
+    float desiredDistance = 100.0f);
+    
 
 
   //TODO
@@ -75,7 +108,8 @@ public:
   //TODO
   static enVector2 arrival(const enVector2& myPos,
     const enVector2& TargetPos,
-    float maxMagnitude);
+    float desiredMagnitude,
+    float radius = 100.0f);
 
   //TODO: create nodes to follow .
   static enVector2 followPath(const enVector2& myPos,
@@ -85,6 +119,7 @@ public:
   sf::Sprite m_sprite;
   sf::Texture m_texture;
   enVector2 m_position;
+  enVector2 m_prevPosition;
 private:
 
   float m_speed;

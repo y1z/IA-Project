@@ -7,12 +7,14 @@ bool
 AppSteeringBehaviors::init()
 {
   m_boids.emplace_back();
-  m_boids[0].loadSprite("../resources/sprites/S_flee.png");
+  m_boids.emplace_back();
+
+  m_boids[0].loadSprite("../resources/sprites/S_generic_boid.png");
   m_boids[0].setPosition(1000, 1000);
 
-  sfHelp::Resize(m_boids[0].m_sprite, 35u, 25u);
+  sfHelp::Resize(m_boids[0].m_sprite, 35u * 10, 25u * 10);
 
-  mptr_target = new enVector2(2000, 200);
+  mptr_target = new Boid(2000, 200);
   mptr_window = new sf::RenderWindow(sf::VideoMode(2000, 2000), " Boids behaviors ");
   mptr_timer = new Timer();
 
@@ -26,6 +28,10 @@ AppSteeringBehaviors::run()
   {
     mptr_timer->StartTiming();
     sf::Event event;
+    enVector2 delta = Boid::seek(m_boids[0].m_position,  mptr_target->m_position , 1.0f);//Boid::arrival(m_boids[0].m_position, *mptr_target, 1.0f,500.0f);//Boid::seek(m_boids[0].m_position, *mptr_target, 1.0f) +
+      //Boid::flee(m_boids[0].m_position, *mptr_target, 1.1f, 1000.0f);
+
+
     while (mptr_window->pollEvent(event))
     {
       if (event.type == sf::Event::Closed)
@@ -33,30 +39,19 @@ AppSteeringBehaviors::run()
 
       if (event.type == sf::Event::KeyPressed)
       {
-        if (event.key.code == sf::Keyboard::Num1)
-        {
-          mptr_target->setValues(0u, 0u);
-        }
-        if (event.key.code == sf::Keyboard::Num2)
-        {
-          mptr_target->setValues(mptr_window->getSize().x, mptr_window->getSize().y);
-        }
 
-        if (event.key.code == sf::Keyboard::Num3)
-        {
-          mptr_target->setValues(mptr_window->getSize().x * 0.5f, mptr_window->getSize().y * 0.5f);
-        }
       }
 
-      if (event.type == sf::Event::MouseButtonPressed) {
-
+      if (event.type == sf::Event::MouseButtonPressed)
+      {
         sf::Vector2i position = sf::Mouse::getPosition(*mptr_window);
 
-        mptr_target->setValues(position.x, position.y);
+        mptr_target->setPosition(position.x, position.y);
       }
     }
-    m_boids[0].m_position += Boid::flee(m_boids[0].m_position, *mptr_target, 1.0f) * mptr_timer->GetResultSecondsFloat() * m_boids[0].getSpeed();
+    m_boids[0].m_position += delta * m_boids[0].getSpeed() * mptr_timer->GetResultSecondsFloat();
 
+    m_boids[0].update();
     mptr_window->clear();
     m_boids[0].m_sprite.setPosition(m_boids[0].m_position.X, m_boids[0].m_position.Y);
     mptr_window->draw(m_boids[0].m_sprite);
