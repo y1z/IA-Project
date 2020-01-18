@@ -120,9 +120,9 @@ Boid::pursue(const enVector2& myPos,
   float deltaTime)
 
 {
-  enVector2 newTargetPosition = Target.getDir() * Target.getSpeed() * deltaTime;
+  enVector2 newTargetPosition = Target.m_position + (Target.getDir() * Target.getSpeed() * deltaTime);
 
-  return  Boid::seek(myPos, newTargetPosition, desiredMagnitude); //enVector2();
+  return  Boid::seek(myPos, newTargetPosition, desiredMagnitude); 
 }
 
 enVector2

@@ -18,7 +18,10 @@ public:
   * @brief : this is where the main starts
   */
   virtual int run() = 0;
-
+/**
+* @brief : used for freeing resources
+* @bugs : no know bugs
+*/
   virtual void destroy() = 0;
   
 };

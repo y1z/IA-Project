@@ -6,22 +6,29 @@
 bool
 AppSteeringBehaviors::init()
 {
+  mptr_target = new Boid(2000, 200);
+  mptr_window = new sf::RenderWindow(sf::VideoMode(2000, 2000), " Boids behaviors ");
+  mptr_timer = new Timer();
+
   m_boids.emplace_back();
   m_boids.emplace_back();
+
+  m_boids[0].setSpeed(m_boids[0].getSpeed() * 2.0f);
+
+  uint32_t Difference = 0;
+
+  static constexpr uint32_t minimumWidth = 35u;
+  static constexpr uint32_t minimumHeight = 25u;
 
   for (Boid& boid : m_boids) {
     if (!boid.loadSprite("../resources/sprites/S_generic_boid.png"))
     {
       return false;
     }
-    boid.setPosition(1000.0f, 1000.0f);
-    sfHelp::Resize(boid.m_sprite, 35u * 5u, 25u * 5u);
+    boid.setPosition(mptr_window->getSize().x / 2 + Difference, mptr_window->getSize().y / 2 + Difference);
+    sfHelp::Resize(boid.m_sprite, minimumWidth * 5u, minimumHeight * 5u);
+    Difference += minimumWidth * 5u * 2;
   }
-
-
-  mptr_target = new Boid(2000, 200);
-  mptr_window = new sf::RenderWindow(sf::VideoMode(2000, 2000), " Boids behaviors ");
-  mptr_timer = new Timer();
 
   return true;
 }
@@ -37,18 +44,26 @@ AppSteeringBehaviors::run()
 
     for (size_t i = 0; i < m_boids.size(); ++i)
     {
-      enVector2 delta;
-      if (i % 2 == 0) {
-        delta += Boid::seek(m_boids[i].m_position, mptr_target->m_position, 1.0f);
-      }
-      else 
+      enVector2 resultingForce;
+      if (i % 2 == 0)
       {
-        delta += Boid::flee(m_boids[i].m_position, mptr_target->m_position, 1.0f, 500.0f);
+        resultingForce += Boid::seek(m_boids[i].m_position, mptr_target->m_position, 1.0f);
+      }
+      else
+      {
+        resultingForce += Boid::pursue(m_boids[i].m_position,
+          m_boids[i - 1],
+          0.9f,
+          mptr_timer->GetResultSecondsFloat());
+      }
+      m_boids[i].update();
+
+      m_boids[i].m_position += resultingForce * m_boids[i].getSpeed() * mptr_timer->GetResultSecondsFloat();
+
+      if (i % 2 == 0) {
+
       }
 
-      m_boids[i].m_position += delta * m_boids[i].getSpeed() * mptr_timer->GetResultSecondsFloat();
-
-      m_boids[i].update();
       m_boids[i].m_sprite.setPosition(m_boids[i].m_position.X, m_boids[i].m_position.Y);
     }
 
