@@ -11,7 +11,7 @@ public:
   ~Boid() = default;
 
 public:
-  void
+  bool
     loadSprite(const std::string& pathToSprite);
 
   void

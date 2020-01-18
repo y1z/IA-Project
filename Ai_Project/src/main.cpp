@@ -4,10 +4,12 @@ int
 main()
 {
   cBaseApp* ptr_app = new AppSteeringBehaviors();
-  ptr_app->init();
+  if (!ptr_app->init()) 
+  {
+    return -1;
+  }
   int result = ptr_app->run();
   ptr_app->destroy();
-
   return  result;
 }
 

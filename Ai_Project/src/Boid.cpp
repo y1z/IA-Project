@@ -18,18 +18,18 @@ Boid::Boid(float x, float y)
   m_position.Y = y;
 }
 
-void
+bool
 Boid::loadSprite(const std::string& pathToSprite)
 {
   if (!m_texture.loadFromFile(pathToSprite))
   {
-    std::cerr << "failed to load sprite \n";
-
+    std::cerr << "failed to load sprite \n"<< "PATH = \'" <<pathToSprite << "\'\n";
+    return false;
   }
   else {
     m_sprite.setTexture(m_texture);
   }
-
+  return true;
 }
 
 void
@@ -149,6 +149,6 @@ Boid::arrival(const enVector2& myPos,
     return Boid::seek(myPos, TargetPos, desiredMagnitude);
   }
 
-  return Boid::seek(myPos,TargetPos,desiredMagnitude) * (difference / radius)  ;
+  return Boid::seek(myPos, TargetPos, desiredMagnitude) * (difference / radius);
 }
 

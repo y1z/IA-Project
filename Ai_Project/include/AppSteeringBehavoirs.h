@@ -23,15 +23,34 @@ public:
   AppSteeringBehaviors() = default;
   ~AppSteeringBehaviors() = default;
 public:
-
+/**
+* @brief : starts by acquiring the resources for the app.
+* @bugs : no know bugs.
+*/
   bool 
   init() override;
-
+/**
+* @brief : this is the main loop for the app.
+* @bugs : no know bugs.
+*/
   int 
   run() override;
 
+/**
+* @brief : free all resource that where acquired
+* @bugs : no know bugs.
+*/
   void
   destroy() override;
+public:
+/**
+* @brief :
+* @bugs :
+*/
+
+  void
+    windowEvents();
+
 private:
   std::vector<Boid> m_boids;
 
