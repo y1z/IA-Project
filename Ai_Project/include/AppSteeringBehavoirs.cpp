@@ -13,7 +13,6 @@ AppSteeringBehaviors::init()
   m_boids.emplace_back();
   m_boids.emplace_back();
 
-  m_boids[0].setSpeed(m_boids[0].getSpeed() * 2.0f);
 
   uint32_t Difference = 0;
 
@@ -38,6 +37,7 @@ AppSteeringBehaviors::run()
 {
   while (mptr_window->isOpen())
   {
+    mptr_window->clear();
     mptr_timer->StartTiming();
 
     this->windowEvents();
@@ -47,28 +47,24 @@ AppSteeringBehaviors::run()
       enVector2 resultingForce;
       if (i % 2 == 0)
       {
-        resultingForce += Boid::seek(m_boids[i].m_position, mptr_target->m_position, 1.0f);
+        resultingForce += Boid::seek(m_boids[i].m_position, mptr_target->m_position, 1.5f);
       }
       else
       {
-        resultingForce += Boid::pursue(m_boids[i].m_position,
+        resultingForce += Boid::evade(m_boids[i].m_position,
           m_boids[i - 1],
-          0.9f,
-          mptr_timer->GetResultSecondsFloat());
+          1.0f,
+          mptr_timer->GetResultSecondsFloat(),
+          500.0f);
       }
       m_boids[i].update();
 
       m_boids[i].m_position += resultingForce * m_boids[i].getSpeed() * mptr_timer->GetResultSecondsFloat();
 
-      if (i % 2 == 0) {
-
-      }
-
       m_boids[i].m_sprite.setPosition(m_boids[i].m_position.X, m_boids[i].m_position.Y);
     }
 
 
-    mptr_window->clear();
     for (const Boid& boid : m_boids)
     {
       mptr_window->draw(boid.m_sprite);
@@ -77,7 +73,7 @@ AppSteeringBehaviors::run()
 
     mptr_timer->EndTiming();
   }
-  // TODO: add everthing needed to run the app
+
   return 0;
 }
 
@@ -111,10 +107,6 @@ AppSteeringBehaviors::windowEvents()
     if (event.type == sf::Event::Closed)
       mptr_window->close();
 
-    if (event.type == sf::Event::KeyPressed)
-    {
-
-    }
 
     if (event.type == sf::Event::MouseButtonPressed)
     {

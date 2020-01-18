@@ -132,7 +132,7 @@ Boid::evade(const enVector2& myPos,
   float deltaTime,
   float desiredDistance)
 {
-  enVector2 newTargetPosition = Target.getDir() * Target.getSpeed() * deltaTime;
+  enVector2 newTargetPosition = Target.m_position + (Target.getDir() * Target.getSpeed() * deltaTime);
 
   return Boid::flee(myPos, newTargetPosition, desiredMagnitude, desiredDistance);
 }
