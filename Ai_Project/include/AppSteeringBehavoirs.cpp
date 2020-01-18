@@ -55,7 +55,7 @@ AppSteeringBehaviors::run()
           m_boids[i - 1],
           1.0f,
           mptr_timer->GetResultSecondsFloat(),
-          500.0f);
+          200.0f);
       }
       m_boids[i].update();
 
@@ -107,12 +107,39 @@ AppSteeringBehaviors::windowEvents()
     if (event.type == sf::Event::Closed)
       mptr_window->close();
 
-
     if (event.type == sf::Event::MouseButtonPressed)
     {
       sf::Vector2i position = sf::Mouse::getPosition(*mptr_window);
 
       mptr_target->setPosition(position.x, position.y);
     }
+
+    if (event.type == sf::Event::KeyPressed)
+    {
+      sf::View currentViewPort = mptr_window->getView();
+
+      if (event.key.code == sf::Keyboard::W)
+      {
+        currentViewPort.move(sf::Vector2f(0.0f, -100.0f));
+        mptr_window->setView(currentViewPort);
+      }
+      if (event.key.code == sf::Keyboard::S)
+      {
+        currentViewPort.move(sf::Vector2f(0.0f, 100.0f));
+        mptr_window->setView(currentViewPort);
+      }
+      if (event.key.code == sf::Keyboard::A)
+      {
+        currentViewPort.move(sf::Vector2f(-100.0f, 0.0f));
+        mptr_window->setView(currentViewPort);
+      }
+      if (event.key.code == sf::Keyboard::D)
+      {
+        currentViewPort.move(sf::Vector2f(100.0f, 0.0f));
+        mptr_window->setView(currentViewPort);
+      }
+
+    }
+
   }
 }
