@@ -4,9 +4,8 @@
 /*!
 \class enVector2 "enVector2.h"
 \brief This class will be used for 2d vector math
-NOTE : all operator with '=' alter the current vector example: += -= *=
+NOTE : all operator with '=' alter the current vector, examples include : += -= *=
 
-TODO : projection , rotation
 */
 
 class enVector2
@@ -33,7 +32,6 @@ public:// functions
   enVector2 Subtract(const enVector2& OtherVector) const;
   /*! crates a new vector */
   enVector2 ScalarMultiplation(float Scalar);
-  /*! Returns a unit vector */
 
   /**
   * @returns : a normalized version of the vector

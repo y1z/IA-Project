@@ -1,6 +1,6 @@
 #include "AppSteeringBehavoirs.h"
 #include "Timer.h"
-#include "CVector2D.h"
+#include "enVector2D.h"
 #include "helper.h"
 
 bool
@@ -24,6 +24,7 @@ AppSteeringBehaviors::init()
     {
       return false;
     }
+    boid.setSpeed(100.0f);
     boid.setPosition(mptr_window->getSize().x / 2 + Difference, mptr_window->getSize().y / 2 + Difference);
     sfHelp::Resize(boid.m_sprite, minimumWidth * 5u, minimumHeight * 5u);
     Difference += minimumWidth * 5u * 2;
@@ -48,6 +49,8 @@ AppSteeringBehaviors::run()
       if (i % 2 == 0)
       {
         resultingForce += Boid::seek(m_boids[i].m_position, mptr_target->m_position, 1.5f);
+
+        printf_s(" <%f, %f> \n",m_boids[i].m_position.X, m_boids[i].m_position.Y);
       }
       else
       {

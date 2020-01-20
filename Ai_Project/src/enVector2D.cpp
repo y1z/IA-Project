@@ -1,4 +1,4 @@
-#include "CVector2D.h"
+#include "enVector2D.h"
 #include <cmath>
 #include <algorithm>
 
@@ -194,8 +194,8 @@ enVector2::RotateReturnDeg(float degrees) const
   //converting degrees to radians 
   degrees = degrees * (3.14159f / 180.0f);
 
-  float TempX = std::cosf(this->X * degrees) - std::sinf(this->Y * degrees);
-  float TempY = std::sinf(this->X * degrees) + std::cosf(this->Y * degrees);
+  const float TempX = std::cosf(this->X * degrees) - std::sinf(this->Y * degrees);
+  const float TempY = std::sinf(this->X * degrees) + std::cosf(this->Y * degrees);
 
   return enVector2(TempX, TempY);
 }
@@ -232,7 +232,7 @@ enVector2::RotateSelfRad(float radians)
   this->Y = TempY;
 }
 
-void 
+void
 enVector2::setValues(float x, float y)
 {
   this->X = x;
