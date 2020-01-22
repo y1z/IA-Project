@@ -89,32 +89,41 @@ public:
     setMass(float newMass);
 public:
 
-  /**
-  * @brief : changes the mass of the boid
-  * @param newSpeed [in] : the new mass for the boid
-  */
-  static enVector2 seek(const enVector2& myPos,
+/**
+* @brief :
+* @bugs :
+*/
+  static enVector2 seek(const Boid& myPos,
+    const Boid& TargetPos,
+    float desiredMagnitude);
+
+/**
+* @brief :
+* @bugs :
+*/
+  static enVector2 seek(const Boid& myPos,
     const enVector2& TargetPos,
     float desiredMagnitude);
 
+
   /**
   * @brief : changes the mass of the boid
   * @param newSpeed [in] : the new mass for the boid
   */
 
-  static enVector2 flee(const enVector2& myPos,
+  static enVector2 flee(const Boid& myBoid,
     const enVector2& TargetPos,
     float desiredMagnitude,
     float desiredDistance = 100.0f);
 
 
-  static enVector2 pursue(const enVector2& myPos,
+  static enVector2 pursue(const Boid& myPos,
     const Boid& Target,
     float desiredMagnitude,
     float deltaTime);
 
 
-  static enVector2 evade(const enVector2& myPos,
+  static enVector2 evade(const Boid& myPos,
     const Boid& Target,
     float desiredMagnitude,
     float deltaTime,
@@ -126,7 +135,7 @@ public:
   static enVector2 wander(const enVector2& myPos,
     float time);
 
-  static enVector2 arrive(const enVector2& myPos,//arrive
+  static enVector2 arrive(const Boid& myBoid,//arrive
     const enVector2& TargetPos,
     float desiredMagnitude,
     float radius = 100.0f);

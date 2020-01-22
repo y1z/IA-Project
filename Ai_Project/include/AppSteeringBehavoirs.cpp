@@ -11,7 +11,9 @@ AppSteeringBehaviors::init()
   mptr_timer = new Timer();
 
   m_boids.emplace_back();
+  m_boids[0].setMass(1.0f);
   m_boids.emplace_back();
+  m_boids[1].setMass(0.5f);
 
 
   uint32_t Difference = 0;
@@ -27,7 +29,7 @@ AppSteeringBehaviors::init()
     boid.setSpeed(100.0f);
     boid.setPosition(mptr_window->getSize().x / 2 + Difference, mptr_window->getSize().y / 2 + Difference);
     sfHelp::Resize(boid.m_sprite, minimumWidth * 5u, minimumHeight * 5u);
-    Difference += minimumWidth * 5u * 2;
+    Difference += minimumWidth * 5u * 3;
   }
 
   return true;
@@ -48,21 +50,22 @@ AppSteeringBehaviors::run()
       enVector2 resultingForce;
       if (i % 2 == 0)
       {
-        resultingForce += Boid::seek(m_boids[i].m_position, mptr_target->m_position, 1.5f);
+        resultingForce += Boid::seek(m_boids[i], mptr_target->m_position, 1.5f);
 
-        printf_s(" <%f, %f> \n",m_boids[i].m_position.X, m_boids[i].m_position.Y);
+        printf_s(" <%f, %f> \n", m_boids[i].m_position.X, m_boids[i].m_position.Y);
       }
       else
       {
-        resultingForce += Boid::evade(m_boids[i].m_position,
+        resultingForce += Boid::pursue(m_boids[i],
           m_boids[i - 1],
           1.0f,
-          mptr_timer->GetResultSecondsFloat(),
-          200.0f);
+          2.0f);
       }
-      m_boids[i].update();
 
-      m_boids[i].m_position += resultingForce * m_boids[i].getSpeed() * mptr_timer->GetResultSecondsFloat();
+      resultingForce *= m_boids[i].getSpeed() * mptr_timer->GetResultSecondsFloat();
+      m_boids[i].addForce(resultingForce );
+
+      m_boids[i].update();
 
       m_boids[i].m_sprite.setPosition(m_boids[i].m_position.X, m_boids[i].m_position.Y);
     }

@@ -6,7 +6,7 @@
 Boid::Boid()
   :m_position(enVector2::zeroVector),
   m_speed(100.0f),
-  m_maxMagnitude(1000.0f),
+  m_maxMagnitude(10.0f),
   m_acceleration(1.0f),
   m_mass(0.5f)
 {
@@ -47,6 +47,11 @@ Boid::update()
     const float reciproical = 1.0f / Mag;
     m_force *= reciproical * m_maxMagnitude;
   }
+
+  enVector2 newPosition((m_position + m_force));
+  
+  m_position += (newPosition - m_position) * m_mass;
+
 }
 
 void
@@ -110,32 +115,42 @@ Boid::setMass(float newMass)
   m_mass = newMass;
 }
 
-enVector2
-Boid::seek(const enVector2& myPos,
-  const enVector2& TargetPos,
+enVector2 Boid::seek(const Boid& myBoid,
+  const Boid& Target,
   float desiredMagnitude)
+
 {
-  enVector2 PathToTarget = TargetPos - myPos;
-  PathToTarget.NormalizeSelf();
+  enVector2 PathToTarget = (Target.m_position - myBoid.m_position).NormalizeReturn() * myBoid.getMass();
   PathToTarget *= desiredMagnitude;
   return  PathToTarget;
 }
 
+enVector2 Boid::seek(const Boid& myBoid,
+  const enVector2& TargetPos,
+  float desiredMagnitude)
+{
+
+  enVector2 PathToTarget = (TargetPos - myBoid.m_position).NormalizeReturn() * myBoid.getMass();
+  PathToTarget *= desiredMagnitude;
+  return  PathToTarget;
+}
+
+
 enVector2
-Boid::flee(const enVector2& myPos,
+Boid::flee(const Boid& myBoid,
   const enVector2& TargetPos,
   float desiredMagnitude,
   float desiredDistance)
 {
-  if ((myPos - TargetPos).Magnitude() <= desiredDistance) {
-    return  Boid::seek(myPos, TargetPos, desiredMagnitude) * -1.0f;
+  if ((myBoid.m_position - TargetPos).Magnitude() <= desiredDistance) {
+    return  Boid::seek(myBoid, TargetPos, desiredMagnitude) * -1.0f;
   }
 
   return enVector2(enVector2::zeroVector);
 }
 
 enVector2
-Boid::pursue(const enVector2& myPos,
+Boid::pursue(const Boid& myBoid,
   const Boid& Target,
   float desiredMagnitude,
   float deltaTime)
@@ -143,11 +158,16 @@ Boid::pursue(const enVector2& myPos,
 {
   enVector2 newTargetPosition = Target.m_position + (Target.getDir() * Target.getSpeed() * deltaTime);
 
-  return  Boid::seek(myPos, newTargetPosition, desiredMagnitude);
+  if (Target.m_position.Distance(newTargetPosition) < myBoid.m_position.Distance(Target.m_position))
+  {
+    return Boid::seek(myBoid, Target.m_position, desiredMagnitude);
+  }
+
+  return Boid::seek(myBoid, newTargetPosition, desiredMagnitude);
 }
 
 enVector2
-Boid::evade(const enVector2& myPos,
+Boid::evade(const Boid& myBoid,
   const Boid& Target,
   float desiredMagnitude,
   float deltaTime,
@@ -155,21 +175,21 @@ Boid::evade(const enVector2& myPos,
 {
   enVector2 newTargetPosition = Target.m_position + (Target.getDir() * Target.getSpeed() * deltaTime);
 
-  return Boid::flee(myPos, newTargetPosition, desiredMagnitude, desiredDistance);
+  return Boid::flee(myBoid, newTargetPosition, desiredMagnitude, desiredDistance);
 }
 
 enVector2
-Boid::arrive(const enVector2& myPos,
+Boid::arrive(const Boid& myBoid,
   const enVector2& TargetPos,
   float desiredMagnitude,
   float radius)
 {
-  const float difference = (TargetPos - myPos).Magnitude();
+  const float difference = (TargetPos - myBoid.m_position).Magnitude();
 
   if (difference >= radius) {
-    return Boid::seek(myPos, TargetPos, desiredMagnitude);
+    return Boid::seek(myBoid, TargetPos, desiredMagnitude);
   }
 
-  return Boid::seek(myPos, TargetPos, desiredMagnitude) * (difference / radius);
+  return Boid::seek(myBoid, TargetPos, desiredMagnitude) * (difference / radius);
 }
 
