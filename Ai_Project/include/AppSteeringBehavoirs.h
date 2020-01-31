@@ -1,11 +1,9 @@
 #pragma once
 #include "cBaseApp.h"
-
 #include <iostream>
-#include <cstdint>
-#include <string>
-#include <SFML/Graphics.hpp>
 #include <vector>
+
+#include <SFML/Graphics.hpp>
 
 #include "Boid.h"
 
@@ -31,31 +29,49 @@ public:
   init() override;
 /**
 * @brief : this is the main loop for the app.
-* @bugs : no know bugs.
+* @bug : no know bugs.
 */
   int 
   run() override;
 
 /**
 * @brief : free all resource that where acquired
-* @bugs : no know bugs.
+* @bug : no know bugs.
 */
   void
   destroy() override;
 public:
 /**
-* @brief :
-* @bugs :
+* @brief : handles all events related with the window
+* @bug : when moving the camera the boids don't go 
+*        to where the user clicks on screen.
 */
-
   void
-    windowEvents();
+  windowEvents();
 
 private:
-  std::vector<Boid> m_boids;
+/**
+* @brief : contains the boids used for the app
+*/
+  std::vector<Boid>
+  m_boids;
+/**
+* @brief : this is the user controlled boid,it is not visible
+*/
+  Boid*
+  mptr_target = nullptr;
 
-  Boid* mptr_target = nullptr;
-  sf::RenderWindow* mptr_window = nullptr;
-  Timer* mptr_timer = nullptr;
+/**
+* @brief : this is the window for the app
+*/
+  sf::RenderWindow*
+  mptr_window = nullptr;
+
+/**
+* @brief : this keep track of how much time has transpired
+*/
+  Timer* 
+  mptr_timer = nullptr;
 };
+
 

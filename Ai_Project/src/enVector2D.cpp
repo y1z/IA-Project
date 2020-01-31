@@ -240,6 +240,12 @@ enVector2::setValues(float x, float y)
 }
 
 
+enVector2 
+enVector2::ReturnFakeParallelVector() const
+{
+  return enVector2(this->X,this->Y * -1);
+}
+
 enVector2
 enVector2::operator+(const enVector2& OtherVector) const
 {
