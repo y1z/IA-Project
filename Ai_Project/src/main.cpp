@@ -1,4 +1,4 @@
-#include "AppSteeringBehavoirs.h"
+#include "AppSteeringBehaviors.h"
 
 int
 main()

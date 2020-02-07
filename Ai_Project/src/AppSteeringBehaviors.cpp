@@ -1,4 +1,4 @@
-#include "AppSteeringBehavoirs.h"
+#include "AppSteeringBehaviors.h"
 #include "Timer.h"
 #include "enVector2D.h"
 #include "helper.h"
