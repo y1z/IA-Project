@@ -201,3 +201,46 @@ Boid::arrive(const Boid& myBoid,
   return Boid::seek(myBoid, TargetPos, desiredMagnitude) * (difference / radius);
 }
 
+enVector2
+Boid::followPath(const Boid& myPos,
+                 std::vector<enNode>& nodes,
+                 float desiredMagnitude)
+{
+  enVector2 result(enVector2::zeroVector);
+
+  for( size_t i = 0; i < nodes.size(); i++ )
+  {
+    if( !nodes[i].is_visited)
+      
+    {
+      if( myPos.m_position.Distance(nodes[i].m_position) <= (nodes[i].m_radius) )
+      {
+        nodes[i].is_visited = true;
+        std::cout << "visited node at coordinates [" << nodes[i].m_position << "] \n";
+      }
+
+      else if( i > 0 && nodes[i].is_visited)
+      {
+        enVector2 vecToNextNode = nodes[i].m_position - nodes[i - 1].m_position;
+        enVector2 ProjectionVector = myPos.m_position.Projection(vecToNextNode);
+        enVector2 FinalPosition =  (nodes[i].m_position - myPos.m_position) + (ProjectionVector - myPos.m_position);
+
+        result = Boid::seek(myPos, FinalPosition, desiredMagnitude);
+
+      //  std::cout << "Final position " << FinalPosition << '\n'
+       // << "node position " << nodes[i].m_position << '\n';
+
+        break;  
+      }
+
+      else
+      {
+        result = Boid::seek(myPos, nodes[i].m_position  , desiredMagnitude);
+        break;
+      }
+    }
+  }
+
+  return result;
+}
+

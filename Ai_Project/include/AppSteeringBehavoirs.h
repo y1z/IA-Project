@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Boid.h"
-
+#include "enNode.h"
 class enVector2;
 class sf::RenderWindow;
 class Timer;
@@ -50,14 +50,23 @@ public:
   windowEvents();
 
 private:
-/**
-* @brief : contains the boids used for the app
-*/
+  /**
+  * @brief : contains the boids used for the app
+  */
   std::vector<Boid>
   m_boids;
-/**
-* @brief : this is the user controlled boid,it is not visible
-*/
+
+  /**
+  * @brief : contains all the nodes for the follow path.
+  * @bug :
+  */
+  std::vector<enNode>
+  m_nodes;
+
+
+  /**
+  * @brief : this is the user controlled boid,it is not visible
+  */
   Boid*
   mptr_target = nullptr;
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "enVector2D.h"
+#include "enNode.h"
 #include "SFML/Graphics.hpp"
+
 #include <string>
 
 class Boid
@@ -177,13 +179,15 @@ public:
 
 
   //TODO : implement
-  static enVector2 wander(const enVector2& myPos,
-                          float time);
+  static enVector2
+  wander(const enVector2& myPos,
+         float time);
 
   //TODO: create nodes to follow .
-  static enVector2 followPath(const enVector2& myPos,
-                              const enVector2& TargetPos,
-                              float maxMagnitude);
+  static enVector2 
+  followPath(const Boid& myPos,
+             std::vector<enNode>& nodes,
+             float desiredMagnitude);
   /**
   * @brief :
   */
