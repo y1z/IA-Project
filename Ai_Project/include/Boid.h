@@ -1,10 +1,15 @@
 #pragma once
 #include "enVector2D.h"
 #include "enNode.h"
+#include "enCircularLinkList.h"
+#include "cIndexer.h"
+
 #include "SFML/Graphics.hpp"
 
-#include <string>
-
+  /**
+  * @brief :Is a A,I agents position and movement.
+  * @bug : no known bugs.
+  */
 class Boid
 {
 public:
@@ -24,24 +29,54 @@ public:
 
   /**
   * @brief : moves the boid and tracks
+  * @param[in] elapsedTime : used to know how much time has passed.
   * @bug : no known bugs
   */
   void
-  update();
+  update(float elapsedTime);
 
 /**
 * @brief : add force to the current vector
 * @bugs : no known bugs
-* @param[in] force : the force that added to the force vector
+* @param[in] additionalForce : the force that added to the force vector
 */
   void
   addForce(const enVector2& additionalForce);
+
+/**
+* @brief : sets force of the boid
+* @bugs : no known bugs
+* @param[in] newForce: the new force of the vector
+*/
+  void
+  setForce(const enVector2& newForce);
 
   /**
   *  @returns :the direction of the boid.
   */
   enVector2
   getDir()const;
+
+  /**
+  * @returns : the current force the boid uses to move.
+  * @bug : no known bugs
+  */
+  enVector2
+  getForce()const;
+
+  /**
+  * @returns : the previously used force for movement
+  * @bug :no known bugs
+  */
+  enVector2
+  getPrevForce()const;
+
+  /**
+  * @returns : the current position of the boid
+  * @bug : no known bugs
+  */
+  enVector2
+  getPosition() const;
 
   /**
   *  @returns : the current value that represent the speed
@@ -60,6 +95,23 @@ public:
   */
   float
   getMass()const;
+
+  /**
+  * @return : the distance between the boid position and a vector
+  * @param[in] otherVector : the vector to get the distance to.
+  * @bug : no known bugs
+  */
+  float 
+  getDistanceTo(const enVector2& otherVector)const;
+
+  /**
+  * @return : the distance between the position of 2 boids.
+  * @param[in] otherBoid : the boid to get the distance to.
+  * @bug : no known bugs
+  */
+  float
+  getDistanceTo(const Boid &otherBoid) const;
+
   /**
   * @brief : set the position of the boid
   */
@@ -78,7 +130,7 @@ public:
   * @bugs : no known bugs
   */
   void
-  setMaxMagnitude(float newMaxMagnitude);
+  setMaxForce(float newMaxForce);
 
   /**
   * @brief : changes the speed of the boid
@@ -93,6 +145,14 @@ public:
   */
   void
   setMass(float newMass);
+
+  /**
+  * @brief : used to set the boid in a wandering state 
+  * @param[in] isWandering : used to set if the boid is wandering or not.
+  * @bug : no known bugs
+  */
+  void
+  setWander(bool isWandering);
 public:
 
   /**
@@ -118,7 +178,6 @@ public:
   seek(const Boid& myPos,
        const enVector2& TargetPos,
        float desiredMagnitude);
-
 
   /**
   * @returns : a vector that gos alway from some target (when the target is close enough). 
@@ -180,16 +239,45 @@ public:
 
   //TODO : implement
   static enVector2
-  wander(const enVector2& myPos,
-         float time);
+  wander(Boid& myBoid,
+         float desiredMagnitude,
+         float angle,
+         float circleRadius,
+         float PredictionTime,
+         float minimumWanderTime = 1.0f,
+         sf::RenderWindow* window = nullptr);
 
-  //TODO: create nodes to follow .
-  static enVector2 
-  followPath(const Boid& myPos,
-             std::vector<enNode>& nodes,
-             float desiredMagnitude);
   /**
-  * @brief :
+  * @returns : a vector directing the boid to the currently selected node. 
+  * @bug :no known bugs.
+  */
+  static enVector2 
+  followPath(Boid& myBoid,
+             enCircularLinkList<enNode>& positions,
+             float desiredMagnitude = 1.0f,
+             sf::RenderWindow * window = nullptr);
+  /**
+  * @brief : the same as follow-path but when the last node is reached start going
+  *          in reverse order.
+  * @bug :no known bugs.
+  */
+  static enVector2 
+  patrol(Boid& myBoid,
+         enCircularLinkList<enNode>& positions,
+         float desiredMagnitude = 1.0f,
+         sf::RenderWindow* window = nullptr);
+private:
+  /**
+  * @brief : limits how much force can be in 'm_forceSum'.
+  * @bug : no known bugs.
+  */
+  void 
+  LimitForceSum();
+  
+
+public:
+  /**
+  * @brief : the container of the sprite for the boid
   */
 
   sf::Sprite m_sprite;
@@ -200,9 +288,19 @@ public:
   sf::Texture m_texture;
 
   /**
-  * @brief :this is the current force that affects the Boid
+  * @brief : this is the force that will affect the force sum
   */
   enVector2 m_force;
+
+  /**
+  * @brief : this controls the force that will be used to move the boid
+  */
+  enVector2 m_forceSum;
+
+  /**
+  * @brief : this is the previous force used by the vector
+  */
+  enVector2 m_prevForce;
 
   /**
   * @brief : this is where the Boid is located
@@ -214,16 +312,24 @@ public:
   */
   enVector2 m_prevPosition;
 
+  /**
+  * @brief : used to keep track of which node the boid is following if 
+  *          any.
+  * @bug : no known bugs
+  */
+  cIndexer m_nodeIndex;
 private:
+
+
   /**
   * @brief : how fast the boid is 
   */
   float m_speed;
 
   /**
-  * @brief : how fast the boid can get.
+  * @brief : how much force can we give a boid
   */
-  float m_maxSpeed;
+  float m_maxForce;
 
   /**
   * @brief : how much the boid can increment its speed
@@ -234,5 +340,27 @@ private:
   * @brief : how difficult it is for the boid to turn
   */
   float m_mass;
+
+  /**
+  * @brief : to know how much more time to spend wandering.
+  * @bug : no known bugs.
+  */
+  float m_currentWanderTime;
+
+  
+
+  /**
+  * @brief : used to know if the boid is a wandering state.
+  * @bug :
+  */
+  bool is_wandering = false;
+
+  enum class ForceAplication
+  {
+    Normal = 0,
+    Wander = 1
+  };
+
+  ForceAplication m_forceAplication = ForceAplication::Normal;
 };
 

@@ -111,31 +111,31 @@ public:// functions
 
   /**
   *  @brief : performs the flooring operation on the current
-              vector values.
+              vector.
   */
   void
   FloorSelf();
 /**
-* @brief :
-* @bug :
+* @return : a vector with all it's values rounded
+* @bugs : no known bugs
 */
   enVector2
   RoundReturn() const;
 /**
-* @brief :
-* @bugs :
+* @brief : rounds the values of the current vector
+* @bugs : no known bugs
 */
   void
   RoundSelf();
 /**
-* @brief :
-* @bugs :
+* @brief : the distance between 2 vectors
+* @bugs : no known bugs
 */
   float
   Distance(const enVector2& other) const;
 /**
-* @brief :
-* @bugs :
+* @returns : the distance between 2 vectors squared
+* @bugs : no known bugs
 */
   float
   DistanceSquared(const enVector2& other) const;
@@ -148,7 +148,8 @@ public:// functions
 
   /*! used to get the angle of the current vector */
   float
-  Angle();
+  getAngle();
+
   /**
   * @brief : calculates the angle in-between two vectors
   * 
@@ -220,27 +221,82 @@ public:
   enVector2&
   operator-= (const enVector2& OtherVector);
 
-  /*!alters this vector and returns the result of multiplication */
+  /**
+  *  @brief : this perform the operation on the current vector
+  *  @return : the vector after the dot product operation
+  *  @bug : no known bugs.
+  */
   enVector2&
   operator%= (const enVector2& OtherVector);
+
   /*! multiples the current vector by a scalar*/
   enVector2&
   operator*= (float Scalar);
 
-
+  /**
+  * @brief : copy's the values of the other vector
+  * @return : the current vector ofter it copied the values of the other vector
+  * @bug : no known bugs.
+  */
   enVector2&
   operator=(const enVector2& OtherVector);
 
+
+  /**
+  *  @brief : compares the individual values of the vector to see if there the same.
+  *  @bug : no known bugs.
+  */
   bool
   operator==(const enVector2& OtherVector);
 
 public: // static const vars
 
+  /**
+  *  @brief : a vector where all the values are zeros
+  */
   static const enVector2 zeroVector;
 
+  /**
+  *  @brief : a vector where all the values are the maximum 
+  *  permitted by the 'float' data type
+  */
   static const enVector2 maxVector;
 
+  /**
+  *  @brief : a vector where all the values are the smallest positive values possible
+  *  @bug : no known bugs.
+  */
   static const enVector2 minVector;
+
+  /**
+  *  @brief : a vector with the most negative values possible
+  *  @bug : no known bugs.
+  */
+  static const enVector2 lowestVector;
+
+  /**
+  *  @brief : a vector which serve as an absolute reference to where 'north' is
+  *  @bug : no known bugs.
+  */
+  static const enVector2 northVector;
+
+  /**
+  *  @brief : a vector which serve as an absolute reference to where 'south' is
+  *  @bug : no known bugs.
+  */
+  static const enVector2 southVector;
+  
+  /**
+  *  @brief : a vector which serve as an absolute reference to where 'west' is
+  *  @bug : no known bugs.
+  */
+  static const enVector2 westVector;
+
+  /**
+  *  @brief : a vector which serve as an absolute reference to where 'east' is
+  *  @bug : no known bugs.
+  */
+  static const enVector2 eastVector;
 
 public://variables 
   union
@@ -252,11 +308,16 @@ public://variables
     };
     float Array[2];
   };
+
+  friend std::ostream& operator<<(std::ostream& Stream, const enVector2& other)
+  {
+    return Stream << '<' << other.X << ',' << other.Y << '>';
+  }
 };
 
-static std::ostream&
-operator<<(std::ostream& Stream, const enVector2& other)
-{
-  return Stream << '<' << other.X << ',' << other.Y << '>';
-}
-
+//static std::ostream&
+//operator<<(std::ostream& Stream, const enVector2& other)
+//{
+//  return Stream << '<' << other.X << ',' << other.Y << '>';
+//}
+//

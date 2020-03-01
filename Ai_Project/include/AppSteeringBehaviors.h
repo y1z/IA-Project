@@ -58,11 +58,10 @@ private:
 
   /**
   * @brief : contains all the nodes for the follow path.
-  * @bug :
+  * @bug : no known bugs.
   */
-  std::vector<enNode>
+  enCircularLinkList<enNode>
   m_nodes;
-
 
   /**
   * @brief : this is the user controlled boid,it is not visible

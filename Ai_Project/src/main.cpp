@@ -1,4 +1,5 @@
 #include "AppSteeringBehaviors.h"
+#include "enCircularLinkList.h"
 
 int
 main()
@@ -10,6 +11,7 @@ main()
   }
   int result = ptr_app->run();
   ptr_app->destroy();
+  delete ptr_app;
   return  result;
 }
 
