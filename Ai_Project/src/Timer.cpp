@@ -79,3 +79,10 @@ float Timer::GetResultSecondsFloat()
 
   return ConverstionSeconds.count();
 }
+
+float
+Timer::GetTimeInSecondsFloat(int64_t time)
+{
+  TimeMeasurementSecondsFloat result = std::chrono::seconds(time);
+  return  result.count();
+}

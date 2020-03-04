@@ -38,6 +38,8 @@ public: // functions
 	double GetResultSecondsDouble();
 	float GetResultSecondsFloat();
 
+	float GetTimeInSecondsFloat(int64_t time);
+
 	void PrintResult();
 private:
 

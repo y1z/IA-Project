@@ -10,11 +10,13 @@
 
 Boid::Boid()
   :m_position(enVector2::zeroVector),
+  m_prevForce(enVector2::northVector),
   m_speed(5.0f),
   m_maxForce(50.0f),
   m_acceleration(1.0f),
   m_mass(0.7f),
-  m_currentWanderTime(0.0f)
+  m_currentWanderTime(0.0f),
+  m_separationRadius(330.0f)
 {}
 
 Boid::Boid(float x, float y)
@@ -198,6 +200,16 @@ Boid::seek(const Boid& myBoid,
   enVector2 PathToTarget = (TargetPos - myBoid.m_position).NormalizeReturn();
   PathToTarget *= desiredMagnitude;
   return  PathToTarget;
+}
+
+enVector2
+Boid::seek(const enVector2& myPos,
+           const enVector2& TargetPos,
+           float desiredMagnitude)
+{
+  enVector2 PathToTarget = (TargetPos - myPos).NormalizeReturn();
+  PathToTarget *= desiredMagnitude;
+  return PathToTarget; 
 }
 
 
@@ -445,6 +457,74 @@ Boid::patrol(Boid& myBoid,
   }
 
   return result;
+}
+
+enVector2
+Boid::Separation(Boid& myPosition,
+                 std::vector<Boid>& BoidsInTheGroup,
+                 float desiredMagnitude)
+{
+  enVector2 result(enVector2::zeroVector);
+  for( Boid& boidInGroup : BoidsInTheGroup )
+  {
+    float const distance = boidInGroup.getDistanceTo(myPosition);
+    float const radius = boidInGroup.m_separationRadius;
+    if( distance < radius) 
+    {
+      result += boidInGroup.getDir() * (1 - ((distance + 0.000001f) / radius)) * desiredMagnitude;
+    }
+  }
+
+  return result;
+}
+
+enVector2
+Boid::Cohesion(Boid& currentPosition,
+               std::vector<Boid>& BoidsInTheGroup,
+               float desiredMagnitude)
+{
+  enVector2 result(enVector2::zeroVector);
+
+  for( Boid& boidInGroup : BoidsInTheGroup )
+  {
+    result += boidInGroup.getPosition();
+  }
+
+  float const reciprocalOfSize = 1.0f / static_cast<float>(BoidsInTheGroup.size());
+
+  result *= reciprocalOfSize;
+
+  return Boid::seek(currentPosition, result, desiredMagnitude);
+}
+
+enVector2 
+Boid::GroupDirection(std::vector<Boid>& BoidsInTheGroup,
+                     float desiredMagnitude)
+{
+  enVector2 result(enVector2::zeroVector);
+
+  for( Boid& boid : BoidsInTheGroup )
+  {
+    result += boid.getDir();
+  }
+
+  float const reciprocalOfSize = 1.0f / static_cast<float>(BoidsInTheGroup.size());
+
+  result *= reciprocalOfSize * desiredMagnitude;
+
+  return result;
+}
+
+enVector2
+Boid::flocking(std::vector<Boid>& BoidsInTheGroup,
+               Boid& individualBoid,
+               float seperationMagnitude,
+               float cohesionMagnitude,
+               float directionMagnitude)
+{
+  return  Boid::Separation(individualBoid, BoidsInTheGroup, seperationMagnitude) +
+    Boid::Cohesion(individualBoid, BoidsInTheGroup, cohesionMagnitude) +
+    Boid::GroupDirection(BoidsInTheGroup, directionMagnitude);
 }
 
 

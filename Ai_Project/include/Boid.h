@@ -180,6 +180,19 @@ public:
        float desiredMagnitude);
 
   /**
+  * @returns : a vector that gos directly to some target. 
+  * @param[in] myPos : where the seeking boid is located.
+  * @param[in] TargetPos : where the target is located.
+  * @param[in] desiredMagnitude : the how strong the return vector is.
+  * @bug : no known bugs
+  */
+  static enVector2 
+  seek(const enVector2& myPos,
+       const enVector2& TargetPos,
+       float desiredMagnitude);
+
+
+  /**
   * @returns : a vector that gos alway from some target (when the target is close enough). 
   * @param[in] myPos : where the fleeing boid is located.
   * @param[in] TargetPos : where the target is located.
@@ -266,6 +279,47 @@ public:
          enCircularLinkList<enNode>& positions,
          float desiredMagnitude = 1.0f,
          sf::RenderWindow* window = nullptr);
+
+  /**
+  * @returns : a vector that makes the boid keep it'states distance from every other boid.
+  * @bug :no known bugs.
+  */
+  static enVector2 
+  Separation(Boid &currentPosition,
+             std::vector<Boid>& BoidsInTheGroup,
+             float desiredMagnitude = 1.0f);
+
+  /**
+  * @returns : a vector that keep the group that the boid are a part of together.
+  * @bug : no known bugs.
+  */
+  static enVector2 
+  Cohesion(Boid &currentPosition,
+           std::vector<Boid>& BoidsInTheGroup,
+           float desiredMagnitude = 1.0f);
+
+  /**
+  * @returns : the average direction of all the boid in the group.
+  * @bug : no known bugs.
+  */
+  static enVector2
+  GroupDirection(std::vector<Boid>& BoidsInTheGroup,
+                 float desiredMagnitude = 1.0f);
+
+
+  /**
+  * @returns : the sum of the following forces 'GroupDirection',
+  *            'Cohesion' and 'Separation'. 
+  * @bug : no known bugs.
+  */
+  static enVector2
+  flocking(std::vector<Boid>& BoidsInTheGroup,
+           Boid& individualBoid,
+           float seperationMagnitude,
+           float cohesionMagnitude,
+           float directionMagnitude);
+
+
 private:
   /**
   * @brief : limits how much force can be in 'm_forceSum'.
@@ -343,15 +397,16 @@ private:
 
   /**
   * @brief : to know how much more time to spend wandering.
-  * @bug : no known bugs.
   */
   float m_currentWanderTime;
 
-  
+  /**
+  * @brief : the radius for the boid in the flocking behavior.
+  */
+  float m_separationRadius;
 
   /**
   * @brief : used to know if the boid is a wandering state.
-  * @bug :
   */
   bool is_wandering = false;
 

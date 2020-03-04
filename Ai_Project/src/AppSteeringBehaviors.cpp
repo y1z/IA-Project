@@ -77,41 +77,41 @@ AppSteeringBehaviors::run()
         resultingForce += Boid::seek(m_boids[i], *mptr_target, 1.5f);
       }
 
-      else if( i % 5 == 1 )
-      {
-        resultingForce += Boid::patrol(m_boids[i],
-                                       m_nodes,
-                                       1.0f,
-                                       mptr_window);
+      //else if( i % 5 == 1 )
+      //{
+      //  resultingForce += Boid::patrol(m_boids[i],
+      //                                 m_nodes,
+      //                                 1.0f,
+      //                                 mptr_window);
 
-        size_t currentIndex = m_boids[i].m_nodeIndex.getIndex();
+      //  size_t currentIndex = m_boids[i].m_nodeIndex.getIndex();
 
-        m_boids[i].m_sprite.setColor(sf::Color(200, 10, 10, 255));
-        //sf::VertexArray Line = sfHelp::CreateVisualLine(m_boids[i].getPosition(),
-        //                                                m_nodes.getPtr(currentIndex)->m_position,
-        //                                                1.0f);
+      //  m_boids[i].m_sprite.setColor(sf::Color(200, 10, 10, 255));
+      //  //sf::VertexArray Line = sfHelp::CreateVisualLine(m_boids[i].getPosition(),
+      //  //                                                m_nodes.getPtr(currentIndex)->m_position,
+      //  //                                                1.0f);
 
-        //mptr_window->draw(Line);
+      //  //mptr_window->draw(Line);
 
-      }
+      //}
 
-      else if( i % 5 == 2 )
-      {
-        m_boids[i].setSpeed(5.0f);
-        resultingForce += Boid::wander(m_boids[i],
-                                      3.5f,
-                                      3.14159f,
-                                      100.0f,
-                                      12.0f,
-                                      0.2f,
-                                      mptr_window);
+      //else if( i % 5 == 2 )
+      //{
+      //  m_boids[i].setSpeed(5.0f);
+      //  resultingForce += Boid::wander(m_boids[i],
+      //                                3.5f,
+      //                                3.14159f,
+      //                                100.0f,
+      //                                12.0f,
+      //                                mptr_timer->GetTimeInSecondsFloat(1),
+      //                                mptr_window);
 
-        m_boids[i].m_sprite.setColor(sf::Color(100, 200, 100, 255));
-       //resultingForce += Boid::arrive(m_boids[i],
-       //                              enVector2(1000, 1000),
-       //                              1.0);
+      //  m_boids[i].m_sprite.setColor(sf::Color(100, 200, 100, 255));
+      // //resultingForce += Boid::arrive(m_boids[i],
+      // //                              enVector2(1000, 1000),
+      // //                              1.0);
 
-      }
+      //}
 
       //else if( i % 5 == 3 )
       //{
@@ -128,6 +128,12 @@ AppSteeringBehaviors::run()
       //                                 3.0f,
       //                                 200.0f);
       //}
+
+      resultingForce += Boid::flocking(m_boids,
+                                       m_boids[i],
+                                       3.6f,
+                                       1.5f,
+                                       1.0f);
 
       float FrameTime = mptr_timer->GetResultSecondsFloat();
 
@@ -226,6 +232,13 @@ AppSteeringBehaviors::windowEvents()
       if( event.key.code == sf::Keyboard::D )
       {
         currentViewPort.move(sf::Vector2f(100.0f, 0.0f));
+        mptr_window->setView(currentViewPort);
+      }
+      if( event.key.code == sf::Keyboard::R )
+      { 
+        enVector2 Position = m_boids[0].m_position;
+        sf::Vector2 sfmlPosition = sfHelp::ConvertToSfmlVector(Position);
+        currentViewPort.setCenter(sfmlPosition);
         mptr_window->setView(currentViewPort);
       }
 
