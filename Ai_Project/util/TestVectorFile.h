@@ -1,6 +1,6 @@
 #pragma once
 #include "CVector2D.h"
-
+#include <iostream>
 
 static void
 printOptions()

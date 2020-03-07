@@ -1,12 +1,13 @@
 #pragma once
 #include "cBaseApp.h"
+#include "Boid.h"
+#include "enNode.h"
+#include "cFSM.h"
+
 #include <iostream>
 #include <vector>
 
 #include <SFML/Graphics.hpp>
-
-#include "Boid.h"
-#include "enNode.h"
 class enVector2;
 class sf::RenderWindow;
 class Timer;
@@ -27,6 +28,7 @@ public:
 */
   bool 
   init() override;
+
 /**
 * @brief : this is the main loop for the app.
 * @bug : no know bugs.
@@ -41,10 +43,23 @@ public:
   void
   destroy() override;
 public:
+  /**
+  * @brief : create all the boid that will participate in the behaviors
+  * @bug : no know bugs.
+  */
+  bool
+  createAllBoids();
+
+  /**
+  * @brief : set all characteristics of the boids.
+  * @bug :no know bugs.
+  */
+  bool 
+  setAllBoids();
+
 /**
 * @brief : handles all events related with the window
-* @bug : when moving the camera the boids don't go 
-*        to where the user clicks on screen.
+* @bug : no known bugs
 */
   void
   windowEvents();
@@ -62,6 +77,11 @@ private:
   */
   enCircularLinkList<enNode>
   m_nodes;
+  /**
+  * @brief :
+  * @bug :
+  */
+
 
   /**
   * @brief : this is the user controlled boid,it is not visible
@@ -80,6 +100,13 @@ private:
 */
   Timer* 
   mptr_timer = nullptr;
+
+  /**
+  * @brief : the finite state machine.
+  * @bug :
+  */
+  cFSM*
+  mptr_fsm = nullptr;
 };
 
 

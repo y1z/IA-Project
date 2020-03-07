@@ -1,23 +1,108 @@
-#include <utility>
-#include"BaseState.h"
+#include "BaseState.h"
+#include <array>
 
-enum states
-{
-  idle,
-};
 
 class cFSM
 {
 public:
   cFSM();
-  ~cFSM() = default;
+  ~cFSM();
+public:
+
+  /**
+  * @brief : used to gather all the resource the FSM needs.
+  * @bug : no known bugs.
+  */
+  bool 
+  init(std::vector<Boid>& boidsContainer,
+       Boid* ptrToTarget = nullptr);
+
+  /**
+  * @brief : cases every boid to perform there own behavior.
+  * @bug : no known bugs.
+  */
+  void
+  executeMachine(float elapsedTime);
 
 
 private:
 
-  BaseState* mptr_currentState = nullptr;
+  /**
+  * @brief : make sure every boid has the appropriate arguments 
+  * before executing some state.
+  * @bug : no known bugs.
+  */
+  void
+  assignArgsForBehavior();
 
-  states m_state = states::idle;
+  /**
+  * @brief : get the data necessary from the boid for the 
+  *         FSM to function.
+  * @bug : no known bugs.
+  */
+  bool 
+  extractBoidData(std::vector<Boid>& boidsContainer);
+
+  /**
+  * @brief : starts each individual instance of each state.
+  * @bug : no known bugs.
+  */
+  bool
+  initStates();
+
+  /**
+  * @brief ; initializes all the default for the arguments of the 
+  * state machine.
+  * @bug : no known bugs.
+  */
+  bool 
+  initArgsForStates( Boid* ptrToTarget = nullptr);
+
+
+private:
+  /**
+  * @brief : keeps track of how many state there are.
+  */
+  constexpr static int32_t c_AmountOfStates = (int32_t)stateFlags::SIZE;
+
+public:
+
+  /**
+  * @brief : for when a behavior needs some target
+  */
+  Boid* 
+  mptr_target = nullptr;
+
+private:
+  /**
+  * @brief : a pointer to a instance of each state.
+  */
+  std::array<BaseState*,c_AmountOfStates> m_StateContainer;
+
+  /**
+  * @brief : parameters for when a boid is in the seek state.
+  */
+  seekStateArgs m_seekArguments;
+
+  /**
+  * @brief : parameters for when a boid is in the idle state.
+  */
+  idleStateArgs m_idleStateArguments;
+
+  /**
+  * @brief : parameters for when a boid is in the Flee state.
+  */
+  fleeStateArgs m_fleeStateArguments;
+
+  /**
+  * @brief : parameters for when a boid is in the Wander state.
+  */
+  wanderStateArgs m_wanderStateArguments;
+
+  /**
+  * @brief : all the boids the state machine will control.
+  */
+  std::vector<sBoidPtrAndState> m_boidsAndState;
 };
 
 

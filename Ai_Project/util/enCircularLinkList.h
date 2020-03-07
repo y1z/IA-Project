@@ -84,7 +84,7 @@ public:
   };
 
   /**
-  * @brief :this will represent the individual element'states in the list 
+  * @brief :this will represent the individual element'stateFlags in the list 
   */
   struct node
   {
@@ -112,10 +112,10 @@ public:
 
   };
 
-private
+private:
   /**
-  * @brief :this is the first node in the list and it'states index will be 0.
-  */:
+  * @brief :this is the first node in the list and it'stateFlags index will be 0.
+  */ 
   node  m_rootNode;
 
   /**

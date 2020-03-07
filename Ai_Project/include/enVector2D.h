@@ -116,7 +116,7 @@ public:// functions
   void
   FloorSelf();
 /**
-* @return : a vector with all it'states values rounded
+* @return : a vector with all it'stateFlags values rounded
 * @bugs : no known bugs
 */
   enVector2
@@ -165,7 +165,7 @@ public:// functions
   enVector2
   RotateReturnDeg(float degrees) const;
   /**
-  *  @brief : rotate'states the current vector by x degrees
+  *  @brief : rotate'stateFlags the current vector by x degrees
   *  @param degrees [in] the amount of degrees which the vector rotates
   */
   void
@@ -177,7 +177,7 @@ public:// functions
   RotateReturnRad(float radians)const;
 
   /**
-  *  @brief : rotate'states the current vector by x radians
+  *  @brief : rotate'stateFlags the current vector by x radians
   *  @param radians [in] the amount of radians which the vector rotates
   */
   void
@@ -234,7 +234,7 @@ public:
   operator*= (float Scalar);
 
   /**
-  * @brief : copy'states the values of the other vector
+  * @brief : copy'stateFlags the values of the other vector
   * @return : the current vector ofter it copied the values of the other vector
   * @bug : no known bugs.
   */

@@ -1,7 +1,6 @@
 #pragma once
   /**
   * @brief : a namespace that contains global variables
-  * @bug :
   */
 namespace gvars
 {

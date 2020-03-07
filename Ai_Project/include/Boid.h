@@ -15,7 +15,7 @@ class Boid
 public:
   Boid();
   Boid(float x, float y);
-  ~Boid() = default;
+  ~Boid();
 
 public:
 
@@ -95,6 +95,12 @@ public:
   */
   float
   getMass()const;
+
+  /**
+  * @returns : the boid id.
+  */
+  uint32_t
+  getID() const;
 
   /**
   * @return : the distance between the boid position and a vector
@@ -250,15 +256,28 @@ public:
          float radius = 100.0f);
 
 
-  //TODO : implement
+  /**
+  * @brief : choses a location for the boid go towards and keep going to that location.
+  */
   static enVector2
-  wander(Boid& myBoid,
-         float desiredMagnitude,
-         float angle,
-         float circleRadius,
-         float PredictionTime,
-         float minimumWanderTime = 1.0f,
-         sf::RenderWindow* window = nullptr);
+  wanderBehavior(Boid& myBoid,
+                 float desiredMagnitude,
+                 float angle,
+                 float circleRadius,
+                 float PredictionTime,
+                 float minimumWanderTime = 1.0f);
+
+
+  /**
+  * @brief : choses a location for the boid go towards and just applies a force.
+  */
+  static enVector2
+  wanderForce(Boid& myBoid,
+              float desiredMagnitude,
+              float angle,
+              float circleRadius,
+              float PredictionTime,
+              float minimumWanderTime = 1.0f);
 
   /**
   * @returns : a vector directing the boid to the currently selected node. 
@@ -269,6 +288,17 @@ public:
              enCircularLinkList<enNode>& positions,
              float desiredMagnitude = 1.0f,
              sf::RenderWindow * window = nullptr);
+
+  /**
+  * @returns : a vector directing the boid to the currently selected node. 
+  * @bug :no known bugs.
+  */
+  static enVector2 
+  followPath(Boid& myBoid,
+             std::vector<enNode>& positions,
+             float desiredMagnitude = 1.0f,
+             sf::RenderWindow * window = nullptr);
+
   /**
   * @brief : the same as follow-path but when the last node is reached start going
   *          in reverse order.
@@ -280,8 +310,19 @@ public:
          float desiredMagnitude = 1.0f,
          sf::RenderWindow* window = nullptr);
 
+
   /**
-  * @returns : a vector that makes the boid keep it'states distance from every other boid.
+  * @brief : the same as follow-path but when the last node is reached start going
+  *          in reverse order.
+  * @bug :no known bugs.
+  */
+  static enVector2 
+  patrol(Boid& myBoid,
+         std::vector<enNode>& positions,
+         float desiredMagnitude = 1.0f,
+         sf::RenderWindow* window = nullptr);
+  /**
+  * @returns : a vector that makes the boid keep it'stateFlags distance from every other boid.
   * @bug :no known bugs.
   */
   static enVector2 
@@ -327,7 +368,6 @@ private:
   */
   void 
   LimitForceSum();
-  
 
 public:
   /**
@@ -336,7 +376,7 @@ public:
 
   sf::Sprite m_sprite;
   /**
-  * @brief : this contains
+  * @brief : this contains the underling image for each boid.
   */
 
   sf::Texture m_texture;
@@ -372,8 +412,8 @@ public:
   * @bug : no known bugs
   */
   cIndexer m_nodeIndex;
-private:
-
+ 
+public:
 
   /**
   * @brief : how fast the boid is 
@@ -398,13 +438,20 @@ private:
   /**
   * @brief : to know how much more time to spend wandering.
   */
-  float m_currentWanderTime;
+  float m_wanderTime;
 
   /**
   * @brief : the radius for the boid in the flocking behavior.
   */
   float m_separationRadius;
 
+ private:
+  /**
+  * @brief : give each boid a unique id.
+  */
+  uint32_t m_id; 
+
+public:
   /**
   * @brief : used to know if the boid is a wandering state.
   */
@@ -418,4 +465,8 @@ private:
 
   ForceAplication m_forceAplication = ForceAplication::Normal;
 };
+
+
+using BoidPtr = Boid*;
+using BoidRef = Boid&;
 

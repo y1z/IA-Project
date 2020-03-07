@@ -2,6 +2,8 @@
 #include "SFML/Main.hpp"
 #include "SFML/Graphics.hpp"
 #include "enVector2D.h"
+#include "definitions.h"
+#include <random>
 #include <cstdint>
 
 namespace sfHelp
@@ -26,7 +28,7 @@ namespace sfHelp
 
   /**
   * @brief : changes the size of the sprite
-  * #bug : no known bugs
+  * @bug : no known bugs
   */
   static void
   Resize(sf::Sprite& sprite,
@@ -93,6 +95,22 @@ namespace sfHelp
 
 
     return result;
+  }
+
+  static int32_t 
+  RandIntRange(int32_t minimum, int32_t maximum)
+  {
+    static bool isSeeded = false;
+    if( isSeeded == false )
+    {
+      srand(time(nullptr));
+      isSeeded = true;
+    }
+
+    int32_t const range = maximum - minimum;
+    float const percentage =  static_cast<float>(rand()) / (RAND_MAX) + 1.0f;
+
+    return  minimum + (range * std::clamp(percentage,0.0f,1.0f));
   }
 
 }

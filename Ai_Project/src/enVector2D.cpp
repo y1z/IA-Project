@@ -193,8 +193,8 @@ enVector2::RotateReturnDeg(float degrees) const
   //converting degrees to radians 
   degrees = degrees * (3.14159f / 180.0f);
 
-  const float TempX = (std::cosf(this->X * degrees) - std::sinf(this->Y * degrees)) * this->X;
-  const float TempY = (std::sinf(this->X * degrees) + std::cosf(this->Y * degrees)) * this->Y;
+  const float TempX = (std::cosf(degrees) * this->X) - (std::sinf(degrees) * this->Y);
+  const float TempY = (std::sinf(degrees) * this->X) + (std::cosf(degrees) * this->Y);
 
   return enVector2(TempX, TempY);
 }
@@ -204,8 +204,8 @@ enVector2::RotateSlefDeg(float degrees)
 {
   degrees = degrees * (3.14159f / 180.0f);
 
-  float TempX = (std::cosf(this->X * degrees) - std::sinf(this->Y * degrees)) * this->X;
-  float TempY =( std::sinf(this->X * degrees) + std::cosf(this->Y * degrees)) * this->Y;
+  const float TempX = (std::cosf(degrees) * this->X) - (std::sinf(degrees) * this->Y);
+  const float TempY = (std::sinf(degrees) * this->X) + (std::cosf(degrees) * this->Y);
 
   this->X = TempX;
   this->Y = TempY;
@@ -215,16 +215,17 @@ enVector2
 enVector2::RotateReturnRad(float radians) const
 {
 
-  float TempX = (std::cosf(this->X * radians) - std::sinf(this->Y * radians)) * this->X;
-  float TempY = (std::sinf(this->X * radians) + std::cosf(this->Y * radians)) * this->Y;
+  const float TempX = (std::cosf(radians) * this->X) - (std::sinf(radians) * this->Y);
+  const float TempY = (std::sinf(radians) * this->X) + (std::cosf(radians) * this->Y);
+
   return enVector2(TempX, TempY);
 }
 
 void
 enVector2::RotateSelfRad(float radians)
 {
-  float TempX = (std::cosf(this->X * radians) - std::sinf(this->Y * radians)) * this->X;
-  float TempY = (std::sinf(this->X * radians) + std::cosf(this->Y * radians)) * this->Y;
+  const float TempX = (std::cosf(radians) * this->X) - (std::sinf(radians) * this->Y);
+  const float TempY = (std::sinf(radians) * this->X) + (std::cosf(radians) * this->Y);
 
   this->X = TempX;
   this->Y = TempY;

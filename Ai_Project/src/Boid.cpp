@@ -8,6 +8,9 @@
 #include <cstdint>
 #include <random>
 
+
+static uint32_t m_idCount = 0u;
+
 Boid::Boid()
   :m_position(enVector2::zeroVector),
   m_prevForce(enVector2::northVector),
@@ -15,15 +18,23 @@ Boid::Boid()
   m_maxForce(50.0f),
   m_acceleration(1.0f),
   m_mass(0.7f),
-  m_currentWanderTime(0.0f),
+  m_wanderTime(0.0f),
   m_separationRadius(330.0f)
-{}
+{
+  m_id = m_idCount;
+  m_idCount++;
+}
 
 Boid::Boid(float x, float y)
   :Boid()
 {
   m_position.X = x;
   m_position.Y = y;
+}
+
+Boid::~Boid()
+{
+  m_idCount--;
 }
 
 bool
@@ -63,11 +74,11 @@ Boid::update(float elapsedTime)
 
   else if( m_forceAplication == ForceAplication::Wander )
   {
-    m_currentWanderTime -= elapsedTime;
-    if( m_currentWanderTime < 0.0f )
+    m_wanderTime -= elapsedTime;
+    if( m_wanderTime < 0.0f )
     {
       m_forceAplication = ForceAplication::Normal;
-      m_currentWanderTime = 0.0f;
+      m_wanderTime = 0.0f;
       m_force = enVector2::zeroVector;
     }
   }
@@ -125,6 +136,12 @@ float
 Boid::getMass() const
 {
   return m_mass;
+}
+
+uint32_t 
+Boid::getID() const
+{
+  return m_id;
 }
 
 float
@@ -285,13 +302,12 @@ Boid::arrive(const Boid& myBoid,
 
 
 enVector2
-Boid::wander(Boid& myBoid,
-             float desiredMagnitude,
-             float angle,
-             float circleRadius,
-             float PredictionTime,
-             float minimumWanderTime,
-             sf::RenderWindow* window)
+Boid::wanderBehavior(Boid& myBoid,
+                     float desiredMagnitude,
+                     float angle,
+                     float circleRadius,
+                     float PredictionTime,
+                     float minimumWanderTime)
 {
   static std::default_random_engine RandomNumber(std::time(nullptr));
   const std::uniform_real_distribution<float> Limits(0.0, 1.0);
@@ -301,42 +317,54 @@ Boid::wander(Boid& myBoid,
   // find out where i am going  
   enVector2 FuturePosition = myBoid.getPosition() + (currentDirection * desiredMagnitude * myBoid.getSpeed()) * PredictionTime;
 
-  if( window )
+  if( myBoid.m_wanderTime <= 0.00f )
   {
-    sf::CircleShape circule(circleRadius);
-    circule.setOrigin(circleRadius, circleRadius);
-    circule.move(sfHelp::ConvertToSfmlVector(FuturePosition));
-    circule.setFillColor(sf::Color::Blue);
-    window->draw(circule);
-  }
-  if( myBoid.m_currentWanderTime <= 0.00f )
-  {
-
     const float angleForBoid = currentDirection.getAngle();
     const float percentageChange = Limits(RandomNumber);
     const float ChangeInAngle = ((percentageChange * angle) - (angle * .5f)) + angleForBoid;
-    std::cout << "angle of the boid = " << angleForBoid << '\n';
-    std::cout << "percentage change in angle = " << percentageChange << '\n';
-    std::cout << " ChangeInAngle = " << ChangeInAngle << '\n';
-
-    //float ChangeInAngle = currentDirection.getAngle() +
-    //  (Limits(RandomNumber) * angle) -
-    //  (angle * .5f);
-
 
     currentDirection.RotateSelfRad(ChangeInAngle);
     enVector2 CirclePosition = FuturePosition + (currentDirection * circleRadius);
 
     enVector2 FinalPosition = CirclePosition - FuturePosition;
 
-    myBoid.m_currentWanderTime = minimumWanderTime;
+    myBoid.m_wanderTime = minimumWanderTime;
     myBoid.setWander(true);
-    std::cout << "wander state going to " << FinalPosition << '\n';
+    std::cout << "wanderBehavior state going to " << FinalPosition << '\n';
 
     return Boid::seek(myBoid, FinalPosition, desiredMagnitude);
   }
 
   return enVector2::zeroVector;
+}
+
+enVector2 Boid::wanderForce(Boid& myBoid,
+                            float desiredMagnitude,
+                            float angle,
+                            float circleRadius,
+                            float PredictionTime,
+                            float minimumWanderTime)
+{
+  static std::default_random_engine RandomNumber(std::time(nullptr));
+  const std::uniform_real_distribution<float> Limits(0.0, 1.0);
+
+  enVector2 result(enVector2::zeroVector);
+  enVector2 currentDirection = myBoid.getDir();
+  // find out where i am going  
+  enVector2 const FuturePosition = myBoid.getPosition()
+    + (currentDirection * desiredMagnitude * myBoid.getSpeed())
+    * PredictionTime;
+
+  float const newAngle = currentDirection.getAngle() + ((Limits(RandomNumber) * angle) - (angle * .5f));
+
+  currentDirection.RotateSelfRad(newAngle);
+
+  enVector2 CirclePosition = FuturePosition + (currentDirection * circleRadius);
+  enVector2 FinalPosition = CirclePosition - FuturePosition;
+
+  myBoid.m_wanderTime = minimumWanderTime;
+
+  return Boid::seek(myBoid, FinalPosition, desiredMagnitude);
 }
 
 enVector2
@@ -370,6 +398,60 @@ Boid::followPath(Boid& myBoid,
     const enVector2 pathBetweenNodes = enVector2(ptrToNode->m_position - ptrToPreviousNode->m_position);
 
     const enVector2 pathFromPreviousNodeToBoid = (myBoid.getPosition() - ptrToPreviousNode->m_position);
+
+    const enVector2 projectionOnPath = pathFromPreviousNodeToBoid.Projection(pathBetweenNodes);
+
+    const enVector2 correctionVector = (projectionOnPath - pathFromPreviousNodeToBoid);
+
+
+    enVector2 finalPath = (correctionVector + directPathToNode);// + myBoid.getPosition();
+
+    if( window != nullptr )
+    {
+      sf::VertexArray Line = sfHelp::CreateVisualLine(myBoid.getPosition(),
+                                                      finalPath,
+                                                      1.0f);
+
+
+      window->draw(Line);
+    }
+
+    result = Boid::seek(myBoid, finalPath + myBoid.getPosition(), desiredMagnitude);
+  }
+
+  return result;
+}
+
+enVector2 
+Boid::followPath(Boid& myBoid,
+                 std::vector<enNode>& nodes,
+                 float desiredMagnitude,
+                 sf::RenderWindow* window)
+{
+  enVector2 result(enVector2::zeroVector);
+  size_t currentIndex = myBoid.m_nodeIndex.getIndex();
+  enNode currentNode = nodes.at(currentIndex);
+
+  if( myBoid.getDistanceTo(currentNode.m_position) < currentNode.m_radius )
+  {
+    myBoid.m_nodeIndex.incrementIndex();
+    myBoid.m_nodeIndex.resetIfIndexEqualsMax(nodes.size());
+    currentIndex = myBoid.m_nodeIndex.getIndex();
+  }
+
+  if( currentIndex == 0 )
+  {
+    result = Boid::seek(myBoid, currentNode.m_position, desiredMagnitude);
+  }
+  else
+  {
+    enNode ptrToPreviousNode = nodes.at(currentIndex - 1);
+
+    const enVector2 directPathToNode = currentNode.m_position - myBoid.getPosition();
+
+    const enVector2 pathBetweenNodes = enVector2(currentNode.m_position - ptrToPreviousNode.m_position);
+
+    const enVector2 pathFromPreviousNodeToBoid = (myBoid.getPosition() - ptrToPreviousNode.m_position);
 
     const enVector2 projectionOnPath = pathFromPreviousNodeToBoid.Projection(pathBetweenNodes);
 
@@ -456,6 +538,70 @@ Boid::patrol(Boid& myBoid,
     result = Boid::seek(myBoid, finalPath + myBoid.getPosition(), desiredMagnitude);
   }
 
+  return result;
+}
+
+enVector2
+Boid::patrol(Boid& myBoid,
+             std::vector<enNode>& nodes,
+             float desiredMagnitude,
+             sf::RenderWindow* window)
+{
+  enVector2 result(enVector2::zeroVector);
+  size_t currentIndex = myBoid.m_nodeIndex.getIndex();
+  enNode currentNode = nodes.at(currentIndex);
+
+
+
+  if( myBoid.getDistanceTo(currentNode.m_position) < currentNode.m_radius )
+  {
+
+    if( currentIndex == 0 )
+    {
+      myBoid.m_nodeIndex.setIncrementAmount(1);
+    }
+    else if( currentIndex == nodes.size() - 1 )
+    {
+      myBoid.m_nodeIndex.setIncrementAmount(-1);
+    }
+
+    myBoid.m_nodeIndex.incrementByIncrementAmount();
+    currentIndex = myBoid.m_nodeIndex.getIndex();
+    //std::cout << "going to next node  = " << currentIndex << '\n';;
+  }
+
+  if( currentIndex == 0 )
+  {
+    result = Boid::seek(myBoid, currentNode.m_position, desiredMagnitude);
+  }
+  else
+  {
+    enNode PreviousNode = nodes.at(currentIndex - 1);
+
+    const enVector2 directPathToNode = currentNode.m_position - myBoid.getPosition();
+
+    const enVector2 pathBetweenNodes = enVector2(currentNode.m_position - PreviousNode.m_position);
+
+    const enVector2 pathFromPreviousNodeToBoid = (myBoid.getPosition() - PreviousNode.m_position);
+
+    const enVector2 projectionOnPath = pathFromPreviousNodeToBoid.Projection(pathBetweenNodes);
+
+    const enVector2 correctionVector = (projectionOnPath - pathFromPreviousNodeToBoid);
+
+    enVector2 finalPath = (correctionVector + directPathToNode);// + myBoid.getPosition();
+
+    if( window != nullptr )
+    {
+      sf::VertexArray Line = sfHelp::CreateVisualLine(myBoid.getPosition(),
+                                                      finalPath,
+                                                      1.0f);
+
+
+      window->draw(Line);
+    }
+
+    result = Boid::seek(myBoid, finalPath + myBoid.getPosition(), desiredMagnitude);
+  }
   return result;
 }
 
