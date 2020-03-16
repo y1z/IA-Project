@@ -1,11 +1,13 @@
 #pragma once
 #include "cBaseApp.h"
 #include "Boid.h"
-#include "enNode.h"
+#include "enPathNode.H"
 #include "cFSM.h"
+#include "enGrid.h"
 
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include <SFML/Graphics.hpp>
 class enVector2;
@@ -75,7 +77,7 @@ private:
   * @brief : contains all the nodes for the follow path.
   * @bug : no known bugs.
   */
-  enCircularLinkList<enNode>
+  enCircularLinkList<enPathNode>
   m_nodes;
   /**
   * @brief :
@@ -87,26 +89,32 @@ private:
   * @brief : this is the user controlled boid,it is not visible
   */
   Boid*
-  mptr_target = nullptr;
+  mp_target = nullptr;
 
 /**
 * @brief : this is the window for the app
 */
   sf::RenderWindow*
-  mptr_window = nullptr;
+  mp_window = nullptr;
 
 /**
 * @brief : this keep track of how much time has transpired
 */
   Timer* 
-  mptr_timer = nullptr;
+  mp_timer = nullptr;
 
   /**
   * @brief : the finite state machine.
   * @bug :
   */
   cFSM*
-  mptr_fsm = nullptr;
+  mp_fsm = nullptr;
+
+  /**
+  * @brief : it's a grid.
+  */
+  std::unique_ptr<enGrid> m_grid = nullptr;
+  
 };
 
 

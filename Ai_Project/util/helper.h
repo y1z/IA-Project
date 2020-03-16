@@ -1,7 +1,7 @@
 #pragma once
 #include "SFML/Main.hpp"
 #include "SFML/Graphics.hpp"
-#include "enVector2D.h"
+#include "enVector2.h"
 #include "definitions.h"
 #include <random>
 #include <cstdint>
@@ -108,9 +108,9 @@ namespace sfHelp
     }
 
     int32_t const range = maximum - minimum;
-    float const percentage =  static_cast<float>(rand()) / (RAND_MAX) + 1.0f;
+    float const percentage = (rand()) / static_cast<float>(RAND_MAX);
 
-    return  minimum + (range * std::clamp(percentage,0.0f,1.0f));
+    return minimum + (range * percentage);
   }
 
 }

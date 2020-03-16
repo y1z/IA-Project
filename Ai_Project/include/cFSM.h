@@ -56,7 +56,7 @@ private:
   * @bug : no known bugs.
   */
   bool 
-  initArgsForStates( Boid* ptrToTarget = nullptr);
+  initArgsForStates(Boid* ptrToTarget = nullptr);
 
 
 private:
@@ -71,7 +71,7 @@ public:
   * @brief : for when a behavior needs some target
   */
   Boid* 
-  mptr_target = nullptr;
+  mp_target = nullptr;
 
 private:
   /**

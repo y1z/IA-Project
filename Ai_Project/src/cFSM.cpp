@@ -148,10 +148,10 @@ cFSM::initArgsForStates(Boid* ptrToTarget)
 {
   if( ptrToTarget != nullptr )
   {
-    mptr_target = ptrToTarget;
-    m_seekArguments.m_target = mptr_target;
+    mp_target = ptrToTarget;
+    m_seekArguments.m_target = mp_target;
 
-    m_fleeStateArguments.m_target = mptr_target;
+    m_fleeStateArguments.m_target = mp_target;
     m_idleStateArguments.m_boids = &m_boidsAndState;
   }
   else { return false; }

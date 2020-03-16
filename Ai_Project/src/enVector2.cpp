@@ -1,4 +1,4 @@
-#include "enVector2D.h"
+#include "enVector2.h"
 #include <cmath>
 #include <algorithm>
 
@@ -86,7 +86,7 @@ enVector2::NormalizeSelf()
 float
 enVector2::Magnitude() const
 {
-  float SquaredMagnitude = (this->X * this->X) + (this->Y * this->Y);
+  float const SquaredMagnitude = (this->X * this->X) + (this->Y * this->Y);
 
   return sqrtf(SquaredMagnitude);
 }
@@ -307,14 +307,6 @@ enVector2::operator-=(const enVector2& OtherVector)
   return *this;
 }
 
-enVector2&
-enVector2::operator%=(const enVector2& OtherVector)
-{
-  this->X = this->X * OtherVector.X;
-  this->Y = this->Y * OtherVector.Y;
-
-  return *this;
-}
 
 enVector2&
 enVector2::operator*=(float Scalar)
@@ -333,9 +325,9 @@ const enVector2 enVector2::minVector(std::numeric_limits<float>::min(), std::num
 
 const enVector2 enVector2::lowestVector(std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest());
 
-const enVector2 enVector2::northVector(0.0f,1.0f);
+const enVector2 enVector2::northVector(0.0f,-1.0f);
 
-const enVector2 enVector2::southVector(0.0f,-1.0f);
+const enVector2 enVector2::southVector(0.0f,1.0f);
 
 const enVector2 enVector2::westVector(-1.0f,0.0f);
 

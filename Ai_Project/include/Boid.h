@@ -1,6 +1,7 @@
 #pragma once
-#include "enVector2D.h"
-#include "enNode.h"
+#include "enVector2.h"
+#include "enPathNode.H"
+#include "enPathNode.h"
 #include "enCircularLinkList.h"
 #include "cIndexer.h"
 
@@ -285,7 +286,7 @@ public:
   */
   static enVector2 
   followPath(Boid& myBoid,
-             enCircularLinkList<enNode>& positions,
+             enCircularLinkList<enPathNode>& positions,
              float desiredMagnitude = 1.0f,
              sf::RenderWindow * window = nullptr);
 
@@ -295,7 +296,7 @@ public:
   */
   static enVector2 
   followPath(Boid& myBoid,
-             std::vector<enNode>& positions,
+             std::vector<enPathNode>& positions,
              float desiredMagnitude = 1.0f,
              sf::RenderWindow * window = nullptr);
 
@@ -306,7 +307,7 @@ public:
   */
   static enVector2 
   patrol(Boid& myBoid,
-         enCircularLinkList<enNode>& positions,
+         enCircularLinkList<enPathNode>& positions,
          float desiredMagnitude = 1.0f,
          sf::RenderWindow* window = nullptr);
 
@@ -318,7 +319,7 @@ public:
   */
   static enVector2 
   patrol(Boid& myBoid,
-         std::vector<enNode>& positions,
+         std::vector<enPathNode>& positions,
          float desiredMagnitude = 1.0f,
          sf::RenderWindow* window = nullptr);
   /**

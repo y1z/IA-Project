@@ -1,6 +1,6 @@
 #include "AppSteeringBehaviors.h"
 #include "Timer.h"
-#include "enVector2D.h"
+#include "enVector2.h"
 #include "helper.h"
 #include "GlobalVariable.h"
 
@@ -8,29 +8,33 @@
 #include <string>
 #include <random>
 
-static constexpr uint32_t minimumWidth = 35u;
-static constexpr uint32_t minimumHeight = 25u;
-static constexpr uint32_t c_totalBoids = 5u;
+static constexpr uint32_t s_minimumWidth = 35u;
+static constexpr uint32_t s_minimumHeight = 25u;
+static constexpr uint32_t s_totalBoids = 5u;
 
 
 bool
 AppSteeringBehaviors::init()
 {
-  mptr_target = new Boid(200, 200);
-  mptr_window = new sf::RenderWindow(sf::VideoMode(2000, 2000),
+  mp_target = new Boid(200, 200);
+  mp_window = new sf::RenderWindow(sf::VideoMode(2000, 2000),
                                      " Boids behaviors ");
-  mptr_timer = new Timer();
-  mptr_fsm = new cFSM();
+  mp_timer = new Timer();
+  mp_fsm = new cFSM();
+
+  m_grid = std::make_unique<enGrid>();
+
+  m_grid->init(30,30,5000.f,5000.f);
 
 
   if( !this->createAllBoids() )
     return false;
 
-  mptr_fsm->init(m_boids, mptr_target);
+  mp_fsm->init(m_boids, mp_target);
 
   for( size_t i = 1; i < 5 + 1; ++i )
   {
-    m_nodes.addNode(enNode(enVector2(std::cosf(i * gvars::quarterPi) * 1000.0f,
+    m_nodes.addNode(enPathNode(enVector2(std::cosf(i * gvars::quarterPi) * 1000.0f,
                     1000.0f * sinf(i * gvars::quarterPi))));//quarter
   }
 
@@ -46,38 +50,38 @@ AppSteeringBehaviors::init()
 int
 AppSteeringBehaviors::run()
 {
-  while( mptr_window->isOpen() )
+  while( mp_window->isOpen() )
   {
-    mptr_window->clear();
-    mptr_timer->StartTiming();
+    mp_window->clear();
+    mp_timer->StartTiming();
 
     this->windowEvents();
 
+    this->m_grid->drawGrid(*mp_window);
+    //const float FrameTime = mp_timer->GetResultSecondsFloat();
 
-    const float FrameTime = mptr_timer->GetResultSecondsFloat();
-
-    this->mptr_fsm->executeMachine(FrameTime);
+    //this->mp_fsm->executeMachine(FrameTime);
 
     //m_boids[i].m_sprite.setPosition(m_boids[i].m_position.X, m_boids[i].m_position.Y);
 
-    for( Boid& boid : m_boids )
-    {
+    //for( Boid& boid : m_boids )
+    //{
 
-      mptr_window->draw(boid.m_sprite);
-      mptr_window->draw(sfHelp::CreateVisualLine(boid.getPosition(),
-                        boid.getPrevForce(),
-                        500.0f));
-    }
+    //  mp_window->draw(boid.m_sprite);
+    //  mp_window->draw(sfHelp::CreateVisualLine(boid.getPosition(),
+    //                    boid.getPrevForce(),
+    //                    500.0f));
+    //}
 
-    for( size_t i = 0; i < m_nodes.getSize(); i++ )
-    {
-      enNode* ptrToNode = m_nodes.getPtr(i);
-      mptr_window->draw(sfHelp::CreateCircle(ptrToNode->m_position));
-    }
+    //for( size_t i = 0; i < m_nodes.getSize(); i++ )
+    //{
+    //  enPathNode* ptrToNode = m_nodes.getPtr(i);
+    //  mp_window->draw(sfHelp::CreateCircle(ptrToNode->m_position));
+    //}
 
-    mptr_window->display();
+    mp_window->display();
 
-    mptr_timer->EndTiming();
+    mp_timer->EndTiming();
   }
 
   return 0;
@@ -86,28 +90,28 @@ AppSteeringBehaviors::run()
 void
 AppSteeringBehaviors::destroy()
 {
-  if( mptr_target != nullptr )
+  if( mp_target != nullptr )
   {
-    delete mptr_target;
-    mptr_target = nullptr;
+    delete mp_target;
+    mp_target = nullptr;
   }
 
-  if( mptr_window != nullptr )
+  if( mp_window != nullptr )
   {
-    delete  mptr_window;
-    mptr_window = nullptr;
+    delete  mp_window;
+    mp_window = nullptr;
   }
 
-  if( mptr_timer != nullptr )
+  if( mp_timer != nullptr )
   {
-    delete mptr_timer;
-    mptr_timer = nullptr;
+    delete mp_timer;
+    mp_timer = nullptr;
   }
 
-  if( mptr_fsm != nullptr )
+  if( mp_fsm != nullptr )
   {
-    delete mptr_fsm;
-    mptr_fsm = nullptr;
+    delete mp_fsm;
+    mp_fsm = nullptr;
   }
 
 }
@@ -116,7 +120,7 @@ bool
 AppSteeringBehaviors::createAllBoids()
 {
 
-  for( size_t i = 0; i < c_totalBoids; ++i )
+  for( size_t i = 0; i < s_totalBoids; ++i )
   {
     m_boids.emplace_back();
   }
@@ -142,9 +146,9 @@ AppSteeringBehaviors::setAllBoids()
     boid.m_sprite.setOrigin(sizeOfSprite.x / 2,
                             sizeOfSprite.y / 2);
 
-    boid.setPosition(mptr_window->getSize().x / 6 + Difference, mptr_window->getSize().y / 2);
-    sfHelp::Resize(boid.m_sprite, minimumWidth * 5u, minimumHeight * 5u);
-    Difference += minimumWidth * 5u * 2;
+    boid.setPosition(mp_window->getSize().x / 6 + Difference, mp_window->getSize().y / 2);
+    sfHelp::Resize(boid.m_sprite, s_minimumWidth * 5u, s_minimumHeight * 5u);
+    Difference += s_minimumWidth * 5u * 2;
   }
 
   return true;
@@ -154,52 +158,67 @@ void
 AppSteeringBehaviors::windowEvents()
 {
 
-  sf::Event event;
-  while( mptr_window->pollEvent(event) )
+  sf::Event windowEvent;
+  while( mp_window->pollEvent(windowEvent) )
   {
-    if( event.type == sf::Event::Closed )
-      mptr_window->close();
+    if( windowEvent.type == sf::Event::Closed )
+      mp_window->close();
 
-    if( event.type == sf::Event::MouseButtonPressed )
+    if( windowEvent.type == sf::Event::Resized )
     {
-      sf::Vector2i MousePosition = sf::Mouse::getPosition(*mptr_window);
+      sf::FloatRect const newWindowSize(0,
+                                        0,
+                                        windowEvent.size.height,
+                                        windowEvent.size.width);
 
-      sf::Vector2f worldPosition = mptr_window->mapPixelToCoords(MousePosition);
-
-      mptr_target->setPosition(worldPosition.x, worldPosition.y);
+      mp_window->setView(sf::View(newWindowSize));
     }
 
-    if( event.type == sf::Event::KeyPressed )
+    if( windowEvent.type == sf::Event::MouseButtonPressed )
     {
-      sf::View currentViewPort = mptr_window->getView();
+      sf::Vector2i const MousePosition = sf::Mouse::getPosition(*mp_window);
 
-      if( event.key.code == sf::Keyboard::W )
+      sf::Vector2f const worldPosition = mp_window->mapPixelToCoords(MousePosition);
+
+      mp_target->setPosition(worldPosition.x, worldPosition.y);
+    }
+
+    if( windowEvent.type == sf::Event::KeyPressed )
+    {
+      sf::View currentViewPort = mp_window->getView();
+
+      if( windowEvent.key.code == sf::Keyboard::W )
       {
         currentViewPort.move(sf::Vector2f(0.0f, -100.0f));
-        mptr_window->setView(currentViewPort);
+        mp_window->setView(currentViewPort);
       }
-      if( event.key.code == sf::Keyboard::S )
+      if( windowEvent.key.code == sf::Keyboard::S )
       {
         currentViewPort.move(sf::Vector2f(0.0f, 100.0f));
-        mptr_window->setView(currentViewPort);
+        mp_window->setView(currentViewPort);
       }
-      if( event.key.code == sf::Keyboard::A )
+      if( windowEvent.key.code == sf::Keyboard::A )
       {
         currentViewPort.move(sf::Vector2f(-100.0f, 0.0f));
-        mptr_window->setView(currentViewPort);
+        mp_window->setView(currentViewPort);
       }
-      if( event.key.code == sf::Keyboard::D )
+      if( windowEvent.key.code == sf::Keyboard::D )
       {
         currentViewPort.move(sf::Vector2f(100.0f, 0.0f));
-        mptr_window->setView(currentViewPort);
+        mp_window->setView(currentViewPort);
       }
-      if( event.key.code == sf::Keyboard::R )
+      if( windowEvent.key.code == sf::Keyboard::R )
       {
         enVector2 Position = m_boids[0].m_position;
         sf::Vector2 sfmlPosition = sfHelp::ConvertToSfmlVector(Position);
         currentViewPort.setCenter(sfmlPosition);
-        mptr_window->setView(currentViewPort);
+        mp_window->setView(currentViewPort);
       }
+      if( windowEvent.key.code == sf::Keyboard::LControl )
+      {
+        mp_window->setView(mp_window->getDefaultView());
+      }
+
 
     }
 

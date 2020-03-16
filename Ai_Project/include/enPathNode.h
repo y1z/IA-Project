@@ -1,12 +1,12 @@
 #pragma once
-#include "enVector2D.h"
+#include "enVector2.h"
 
-class enNode
+class enPathNode
 {
 public:
-  enNode();
-  enNode(const enVector2 &position, float radius = 100.0f);
-  ~enNode() = default;
+  enPathNode();
+  enPathNode(const enVector2 &position, float radius = 100.0f);
+  ~enPathNode() = default;
 public:
   /**
   * @brief : used to know where the position of the node is.

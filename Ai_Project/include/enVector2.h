@@ -221,13 +221,6 @@ public:
   enVector2&
   operator-= (const enVector2& OtherVector);
 
-  /**
-  *  @brief : this perform the operation on the current vector
-  *  @return : the vector after the dot product operation
-  *  @bug : no known bugs.
-  */
-  enVector2&
-  operator%= (const enVector2& OtherVector);
 
   /*! multiples the current vector by a scalar*/
   enVector2&

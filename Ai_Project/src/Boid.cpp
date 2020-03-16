@@ -369,13 +369,13 @@ enVector2 Boid::wanderForce(Boid& myBoid,
 
 enVector2
 Boid::followPath(Boid& myBoid,
-                 enCircularLinkList<enNode>& nodes,
+                 enCircularLinkList<enPathNode>& nodes,
                  float desiredMagnitude,
                  sf::RenderWindow* window)
 {
   enVector2 result(enVector2::zeroVector);
   size_t currentIndex = myBoid.m_nodeIndex.getIndex();
-  enNode* ptrToNode = nodes.getPtr(currentIndex);
+  enPathNode* ptrToNode = nodes.getPtr(currentIndex);
 
   if( myBoid.getDistanceTo(ptrToNode->m_position) < ptrToNode->m_radius )
   {
@@ -391,7 +391,7 @@ Boid::followPath(Boid& myBoid,
   }
   else
   {
-    enNode* ptrToPreviousNode = nodes.getPtr(currentIndex - 1);
+    enPathNode* ptrToPreviousNode = nodes.getPtr(currentIndex - 1);
 
     const enVector2 directPathToNode = ptrToNode->m_position - myBoid.getPosition();
 
@@ -424,13 +424,13 @@ Boid::followPath(Boid& myBoid,
 
 enVector2 
 Boid::followPath(Boid& myBoid,
-                 std::vector<enNode>& nodes,
+                 std::vector<enPathNode>& nodes,
                  float desiredMagnitude,
                  sf::RenderWindow* window)
 {
   enVector2 result(enVector2::zeroVector);
   size_t currentIndex = myBoid.m_nodeIndex.getIndex();
-  enNode currentNode = nodes.at(currentIndex);
+  enPathNode currentNode = nodes.at(currentIndex);
 
   if( myBoid.getDistanceTo(currentNode.m_position) < currentNode.m_radius )
   {
@@ -445,7 +445,7 @@ Boid::followPath(Boid& myBoid,
   }
   else
   {
-    enNode ptrToPreviousNode = nodes.at(currentIndex - 1);
+    enPathNode ptrToPreviousNode = nodes.at(currentIndex - 1);
 
     const enVector2 directPathToNode = currentNode.m_position - myBoid.getPosition();
 
@@ -478,13 +478,13 @@ Boid::followPath(Boid& myBoid,
 
 enVector2
 Boid::patrol(Boid& myBoid,
-             enCircularLinkList<enNode>& nodes,
+             enCircularLinkList<enPathNode>& nodes,
              float desiredMagnitude,
              sf::RenderWindow* window)
 {
   enVector2 result(enVector2::zeroVector);
   size_t currentIndex = myBoid.m_nodeIndex.getIndex();
-  enNode* ptrToNode = nodes.getPtr(currentIndex);
+  enPathNode* ptrToNode = nodes.getPtr(currentIndex);
 
 
 
@@ -511,7 +511,7 @@ Boid::patrol(Boid& myBoid,
   }
   else
   {
-    enNode* ptrToPreviousNode = nodes.getPtr(currentIndex - 1);
+    enPathNode* ptrToPreviousNode = nodes.getPtr(currentIndex - 1);
 
     const enVector2 directPathToNode = ptrToNode->m_position - myBoid.getPosition();
 
@@ -543,13 +543,13 @@ Boid::patrol(Boid& myBoid,
 
 enVector2
 Boid::patrol(Boid& myBoid,
-             std::vector<enNode>& nodes,
+             std::vector<enPathNode>& nodes,
              float desiredMagnitude,
              sf::RenderWindow* window)
 {
   enVector2 result(enVector2::zeroVector);
   size_t currentIndex = myBoid.m_nodeIndex.getIndex();
-  enNode currentNode = nodes.at(currentIndex);
+  enPathNode currentNode = nodes.at(currentIndex);
 
 
 
@@ -576,7 +576,7 @@ Boid::patrol(Boid& myBoid,
   }
   else
   {
-    enNode PreviousNode = nodes.at(currentIndex - 1);
+    enPathNode PreviousNode = nodes.at(currentIndex - 1);
 
     const enVector2 directPathToNode = currentNode.m_position - myBoid.getPosition();
 
