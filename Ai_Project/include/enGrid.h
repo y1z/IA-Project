@@ -1,10 +1,13 @@
 #pragma once
-#include <vector>
+#include <deque>
 #include <cstdint>
 #include "enVector2.h"
 #include "enGridNode.h"
 #include <SFML/Graphics.hpp>
 
+  /**
+  * @brief : represents a grid 
+  */
 class enGrid
 {
 public:
@@ -17,8 +20,11 @@ public:
 public:
 
   /**
-  * @brief : create's a grid 
-  * @param[in] widthOfGrid : controls how many 
+  * @brief : create's a grid.
+  * @param[in] widthOfGrid : controls how many columns the grid has per row.
+  * @param[in] heighOfGrid : controls how many rows the grid has per columns.
+  * @param[in] heighOfWorld : the total width of the grid.
+  * @param[in] heighOfGrid :  the total height of the grid.
   */
   bool 
   init(int64_t widthOfGrid,
@@ -42,23 +48,48 @@ private:
                         int64_t heightOfGrid,
                         float widthOfWorld,
                         float heightOfWorld);
+
   /**
   * @note : the first index is 0,0
   * @retuns : true if the row and column index exist in the grid; false otherwise.
-  * @param[in] row : which row is the node located at.
   * @param[in] column : which column is the node located at.
+  * @param[in] row : which row is the node located at.
   * @bug : no known bugs.
   */
   bool
   checkIfInBound(int64_t column,
-                 int64_t row);
+                 int64_t row) const;
 
+public:
   /**
-  * @returns: the index where a particular node is located.
+  * @returns: the index where a particular node is located or -1 when the node 
+  * does not exist.
+  * @bug : no known bugs.
   */
   int64_t
   getNodeIndex(int64_t column,
-               int64_t row);
+               int64_t row) const;
+
+  /**
+  * @retuns : a pointer to a node.
+  * @bug : no known bugs.
+  */
+  enGridNode*
+  getNodePtrByIndex(int64_t nodeIndex);
+
+  /**
+  * @retuns : a copy of a node
+  * @bug : no known bugs.
+  */
+  enGridNode
+  getNodeByIndex(int64_t nodeIndex) const;
+
+  /**
+  * @returns :the container of the grid.
+  * @bug : no known bugs.
+  */
+  std::deque<enGridNode>& const
+  getGridRef();
 
 private:
 
@@ -102,8 +133,8 @@ private:
 
 
   /**
-  * @brief : represents the grid. 
+  * @brief : contains the grid itself. 
   */
-	std::vector<enGridNode> m_gridNodes;
+	std::deque<enGridNode> m_gridNodes;
 };
 

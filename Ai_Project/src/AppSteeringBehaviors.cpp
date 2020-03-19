@@ -210,7 +210,7 @@ AppSteeringBehaviors::windowEvents()
       if( windowEvent.key.code == sf::Keyboard::R )
       {
         enVector2 Position = m_boids[0].m_position;
-        sf::Vector2 sfmlPosition = sfHelp::ConvertToSfmlVector(Position);
+        sf::Vector2 const sfmlPosition = sfHelp::ConvertToSfmlVector(Position);
         currentViewPort.setCenter(sfmlPosition);
         mp_window->setView(currentViewPort);
       }

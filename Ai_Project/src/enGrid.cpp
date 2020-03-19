@@ -56,8 +56,8 @@ enGrid::drawGrid(sf::RenderWindow& window)
 
   for( enGridNode& node : m_gridNodes )
   {
-    m_sharedRactangle.setFillColor(node.m_nodeColor);
-    m_sharedRactangle.setPosition(sfHelp::ConvertToSfmlVector(node.m_worldPos));
+    m_sharedRactangle.setFillColor(node.getColor());
+    m_sharedRactangle.setPosition(sfHelp::ConvertToSfmlVector(node.m_data.m_worldPos));
     window.draw(m_sharedRactangle);
   }
 
@@ -97,7 +97,7 @@ enGrid::checkSizeRequirements(int64_t widthOfGrid,
 
 bool
 enGrid::checkIfInBound(int64_t column,
-                       int64_t row)
+                       int64_t row) const
 {
   if( !((m_rowTotal - 1) <= row) || (row < 0) )
   {
@@ -115,7 +115,7 @@ enGrid::checkIfInBound(int64_t column,
 
 int64_t
 enGrid::getNodeIndex(int64_t column,
-                     int64_t row)
+                     int64_t row)const
 {
   int64_t result = -1;
   if( checkIfInBound(column, row) )
@@ -124,4 +124,33 @@ enGrid::getNodeIndex(int64_t column,
   }
 
   return result;
+}
+
+enGridNode*
+enGrid::getNodePtrByIndex(int64_t nodeIndex)
+{
+  if( nodeIndex < m_gridNodes.size() && nodeIndex > -1 )
+  {
+    return &m_gridNodes[nodeIndex];
+  }
+  return nullptr;
+}
+
+enGridNode 
+enGrid::getNodeByIndex(int64_t nodeIndex) const
+{
+  enGridNode result;
+  if( nodeIndex < m_gridNodes.size() && nodeIndex > -1 )
+  {
+    result = m_gridNodes[nodeIndex];
+    return result;
+  }
+
+  return  result;
+}
+
+std::deque<enGridNode>& const
+enGrid::getGridRef() 
+{
+  return m_gridNodes;
 }
