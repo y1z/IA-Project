@@ -4,13 +4,14 @@
 #include "enPathNode.H"
 #include "cFSM.h"
 #include "enGrid.h"
+#include "enRoom.h"
 
 #include <iostream>
 #include <vector>
 #include <memory>
 
 #include <SFML/Graphics.hpp>
-class enVector2;
+
 class sf::RenderWindow;
 class Timer;
 
@@ -45,6 +46,18 @@ public:
   void
   destroy() override;
 public:
+
+private:
+
+  /**
+  * @returns : true if no error occurred.
+  * @brief :updates anything that need to update.
+  */
+  bool
+  update(float elapsedTime);
+
+
+public:
   /**
   * @brief : create all the boid that will participate in the behaviors
   * @bug : no know bugs.
@@ -54,10 +67,17 @@ public:
 
   /**
   * @brief : set all characteristics of the boids.
-  * @bug :no know bugs.
+  * @bug :no known bugs.
   */
   bool 
   setAllBoids();
+
+  /**
+  * @brief : sets up the player.
+  * @bug : no known bugs.
+  */
+  bool 
+  setUpPlayer();
 
 /**
 * @brief : handles all events related with the window
@@ -79,41 +99,46 @@ private:
   */
   enCircularLinkList<enPathNode>
   m_nodes;
-  /**
-  * @brief :
-  * @bug :
-  */
-
 
   /**
   * @brief : this is the user controlled boid,it is not visible
   */
   Boid*
-  mp_target = nullptr;
+  m_pTarget = nullptr;
+
+  /**
+  * @brief : the player controlled boid.
+  */
+  std::unique_ptr<Boid>
+  m_pPlayer = nullptr;
+
+  std::unique_ptr<enRoom>
+  m_pRoom = nullptr;
+
 
 /**
 * @brief : this is the window for the app
 */
   sf::RenderWindow*
-  mp_window = nullptr;
+  m_pWindow = nullptr;
 
 /**
 * @brief : this keep track of how much time has transpired
 */
   Timer* 
-  mp_timer = nullptr;
+  m_pTimer = nullptr;
 
   /**
   * @brief : the finite state machine.
   * @bug :
   */
   cFSM*
-  mp_fsm = nullptr;
+  m_pFsm = nullptr;
 
   /**
   * @brief : it's a grid.
   */
-  std::unique_ptr<enGrid> m_grid = nullptr;
+  std::unique_ptr<enGrid> m_pGrid = nullptr;
   
 };
 

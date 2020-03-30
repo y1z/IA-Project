@@ -62,20 +62,20 @@ public:// functions
   NormalizeSelf();
 
   /**
-  *  @returns : how long the vector is 
+  *  @returns : how long the vector is.
   */
   float 
   Magnitude() const;
 
   /**
-  *  @returns : how long vector is squared
+  *  @returns : how long the vector is squared.
   */
   float 
   SquaredMagnitude() const;
+
   /**
   *  @returns : 1/magnitude of the current vector
   */
-
   float
   InverseSquaredRoot() const;
   /**
@@ -148,7 +148,7 @@ public:// functions
 
   /*! used to get the angle of the current vector */
   float
-  getAngle();
+  getAngle() const;
 
   /**
   * @brief : calculates the angle in-between two vectors

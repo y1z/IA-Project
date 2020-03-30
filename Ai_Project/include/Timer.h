@@ -21,8 +21,7 @@ class Timer
 	using TimeMeasurementSecondsFloat = std::chrono::duration<float, std::ratio<1, 1>>;
 
 	/*! making a typedef to be used with the chrono library*/
-	using TimePointPicoSeconds = std::chrono::time_point<std::chrono::steady_clock, TimeMeasurementNano>;
-
+	using TimePointNanoSeconds = std::chrono::time_point<std::chrono::steady_clock, TimeMeasurementNano>;
 public:// constructor
 	Timer();
 	~Timer();
@@ -44,8 +43,8 @@ public: // functions
 private:
 
 private:// variables
-	TimePointPicoSeconds m_Start;
-	TimePointPicoSeconds m_End;
+	TimePointNanoSeconds m_Start;
+	TimePointNanoSeconds m_End;
 
 	TimeMeasurementNano m_Result;
 };

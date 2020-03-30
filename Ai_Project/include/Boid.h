@@ -1,6 +1,6 @@
 #pragma once
 #include "enVector2.h"
-#include "enPathNode.H"
+
 #include "enPathNode.h"
 #include "enCircularLinkList.h"
 #include "cIndexer.h"
@@ -16,6 +16,7 @@ class Boid
 public:
   Boid();
   Boid(float x, float y);
+  explicit Boid(enVector2 const& position);
   ~Boid();
 
 public:
@@ -35,6 +36,20 @@ public:
   */
   void
   update(float elapsedTime);
+
+  /**
+  * @brief : updates how a force is applied
+  * @bug :no known bugs.
+  */
+  void 
+  updateForceAplication(float elapsedTime);
+
+  /**
+  * @brief : update how momentum affects the boid.
+  * @bug :no known bugs.
+  */
+  void
+  updateMomentum(float elapsedTime);
 
 /**
 * @brief : add force to the current vector
@@ -155,24 +170,41 @@ public:
 
   /**
   * @brief : used to set the boid in a wandering state 
-  * @param[in] isWandering : used to set if the boid is wandering or not.
+  * @param[in] timeToWander: how long will the boid wander.
   * @bug : no known bugs
   */
   void
-  setWander(bool isWandering);
+  setBoidWander(float timeToWander);
 public:
 
   /**
   * @returns : a vector that gos directly to some target. 
   * @param[in] myPos : where the seeking boid is located.
-  * @param[in] TargetPos : where the target is located.
-  * @param[in] desiredMagnitude : the how strong the return vector is.
-  * @bug : no known bugs
   */
   static enVector2
   seek(const Boid& myPos,
        const Boid& TargetPos,
        float desiredMagnitude);
+
+  /**
+  * @returns a vector that gos directly to some target.
+  * @param[in] TargetPos : where the target is located.
+  * @param[in] strengthOfForce: the how strong the return vector is.
+  * @bug : no known bugs
+  */
+  enVector2
+  seek(const Boid& TargetPos,
+       float strengthOfForce);
+
+
+  /**
+  * @param[in] TargetPos : where the target is located.
+  * @param[in] strengthOfForce: the how strong the return vector is.
+  * @bug : no known bugs
+  */
+  enVector2
+  seek(const enVector2& TargetPos,
+       float strengthOfForce);
 
   /**
   * @returns : a vector that gos directly to some target. 
@@ -214,6 +246,18 @@ public:
        float desiredDistance = 100.0f);
 
   /**
+  * @returns : a vector that gos alway from some target (when the target is close enough). 
+  * @param[in] TargetPos : where the target is located.
+  * @param[in] desiredMagnitude : the how strong the return vector is.
+  * @param[in] desiredDistance : how close the target to start fleeing.
+  * @bug : no known bugs
+  */
+  enVector2
+  flee(const enVector2& TargetPos,
+       float strengthOfForce,
+       float desiredDistance = 100.0f);
+
+  /**
   * @returns : a vector that try to move to where the target is going to be.
   * @param[in] myPos : where the pursuing boid is located.
   * @param[in] TargetPos : where the target is located.
@@ -226,6 +270,20 @@ public:
          const Boid& Target,
          float desiredMagnitude,
          float deltaTime);
+
+
+  /**
+  * @returns : a vector that try to move to where the target is going to be.
+  * @param[in] Target : where the target is located.
+  * @param[in] strengthOfForce : the how strong the return vector is.
+  * @param[in] desiredDistance : how close the target to start fleeing.
+  * @bug : no known bugs.
+  */
+  enVector2
+  pursue(const Boid& Target,
+         float strengthOfForce,
+         float deltaTime);
+
 
   /**
   * @returns : a vector that will get close to some target then slow down.
@@ -244,6 +302,19 @@ public:
 
   /**
   * @returns : a vector that will get close to some target then slow down.
+  * @param[in] Target : where the target is located.
+  * @param[in] strengthOfForce: the how strong the return vector is.
+  * @param[in] desiredDistance : how close the target to start fleeing.
+  * @bug : no known bugs.
+  */
+  enVector2
+  evade(const Boid& Target,
+        float strengthOfForce,
+        float deltaTime,
+        float desiredDistance = 100.0f);
+
+  /**
+  * @returns : a vector that will get close to some target then slow down.
   * @param[in] myPos : where the seeking boid is located.
   * @param[in] TargetPos : where the target is located.
   * @param[in] desiredMagnitude : the how strong the return vector is.
@@ -256,80 +327,82 @@ public:
          float desiredMagnitude,
          float radius = 100.0f);
 
+  /**
+  * @returns : a vector that will get close to some target then slow down.
+  * @param[in] TargetPos : where the target is located.
+  * @param[in] strengthOfForce : the how strong the return vector is.
+  * @param[in] radius : how close the target needs to be, before we flee.
+  * @bug : no known bugs.
+  */
+  enVector2 
+  arrive(const enVector2& TargetPos,
+         float strengthOfForce,
+         float radius = 100.0f);
 
   /**
   * @brief : choses a location for the boid go towards and keep going to that location.
+  * @param[in] strengthOfForce: how strong the resulting force.
   */
-  static enVector2
-  wanderBehavior(Boid& myBoid,
-                 float desiredMagnitude,
+  enVector2
+  wanderBehavior(float strengthOfForce,
                  float angle,
                  float circleRadius,
                  float PredictionTime,
                  float minimumWanderTime = 1.0f);
 
-
   /**
-  * @brief : choses a location for the boid go towards and just applies a force.
+  * @brief : creates a path for the boid to follow.
+  * @bug : no known bugs.
   */
-  static enVector2
-  wanderForce(Boid& myBoid,
-              float desiredMagnitude,
-              float angle,
-              float circleRadius,
-              float PredictionTime,
-              float minimumWanderTime = 1.0f);
+  enVector2 
+  followPath(enCircularLinkList<enPathNode>& positions,
+             float strengthOfForce = 1.0f,
+             sf::RenderWindow* window = nullptr);
 
   /**
   * @returns : a vector directing the boid to the currently selected node. 
   * @bug :no known bugs.
   */
-  static enVector2 
-  followPath(Boid& myBoid,
-             enCircularLinkList<enPathNode>& positions,
+  enVector2 
+  followPath(std::vector<enPathNode>& positions,
              float desiredMagnitude = 1.0f,
-             sf::RenderWindow * window = nullptr);
-
-  /**
-  * @returns : a vector directing the boid to the currently selected node. 
-  * @bug :no known bugs.
-  */
-  static enVector2 
-  followPath(Boid& myBoid,
-             std::vector<enPathNode>& positions,
-             float desiredMagnitude = 1.0f,
-             sf::RenderWindow * window = nullptr);
+             sf::RenderWindow* window = nullptr);
 
   /**
   * @brief : the same as follow-path but when the last node is reached start going
   *          in reverse order.
   * @bug :no known bugs.
   */
-  static enVector2 
-  patrol(Boid& myBoid,
-         enCircularLinkList<enPathNode>& positions,
+  enVector2 
+  patrol(enCircularLinkList<enPathNode>& positions,
          float desiredMagnitude = 1.0f,
          sf::RenderWindow* window = nullptr);
-
 
   /**
   * @brief : the same as follow-path but when the last node is reached start going
   *          in reverse order.
   * @bug :no known bugs.
   */
-  static enVector2 
-  patrol(Boid& myBoid,
-         std::vector<enPathNode>& positions,
+  enVector2 
+  patrol(std::vector<enPathNode>& positions,
          float desiredMagnitude = 1.0f,
          sf::RenderWindow* window = nullptr);
-  /**
+
+ /**
   * @returns : a vector that makes the boid keep it'stateFlags distance from every other boid.
   * @bug :no known bugs.
   */
-  static enVector2 
-  Separation(Boid &currentPosition,
-             std::vector<Boid>& BoidsInTheGroup,
+  enVector2
+  Separation(std::vector<Boid>& BoidsInTheGroup,
              float desiredMagnitude = 1.0f);
+
+  /**
+  * @returns : a vector that keep the group that the boid are a part of together.
+  * @bug : no known bugs.
+  */
+  enVector2 
+  Cohesion(std::vector<Boid>& BoidsInTheGroup,
+           float desiredMagnitude = 1.0f);
 
   /**
   * @returns : a vector that keep the group that the boid are a part of together.
@@ -340,27 +413,25 @@ public:
            std::vector<Boid>& BoidsInTheGroup,
            float desiredMagnitude = 1.0f);
 
+
   /**
   * @returns : the average direction of all the boid in the group.
   * @bug : no known bugs.
   */
-  static enVector2
+  enVector2
   GroupDirection(std::vector<Boid>& BoidsInTheGroup,
                  float desiredMagnitude = 1.0f);
-
 
   /**
   * @returns : the sum of the following forces 'GroupDirection',
   *            'Cohesion' and 'Separation'. 
   * @bug : no known bugs.
   */
-  static enVector2
+  enVector2
   flocking(std::vector<Boid>& BoidsInTheGroup,
-           Boid& individualBoid,
            float seperationMagnitude,
            float cohesionMagnitude,
            float directionMagnitude);
-
 
 private:
   /**
@@ -371,15 +442,15 @@ private:
   LimitForceSum();
 
 public:
+
   /**
   * @brief : the container of the sprite for the boid
   */
-
   sf::Sprite m_sprite;
+
   /**
   * @brief : this contains the underling image for each boid.
   */
-
   sf::Texture m_texture;
 
   /**
@@ -432,37 +503,59 @@ public:
   float m_acceleration;
 
   /**
+  * @brief : control how much momentum the boid keep every time it slows down.
+  */  
+  float m_momentumKeept;
+
+  /**
+  * @brief : determines how much for does a boid needs before the momentum loss
+  * kick in.
+  */
+  float m_minimumTimeForMomentiumLoss;
+
+  /**
   * @brief : how difficult it is for the boid to turn
   */
   float m_mass;
 
   /**
-  * @brief : to know how much more time to spend wandering.
+  * @brief : to keep track of the amount of time spent wandering.
   */
-  float m_wanderTime;
+  float m_wanderTimeTotal;
+
+  /**
+  * @brief : controls the amount of time the boid will wander.
+  */
+  float m_timeForWandering;
+
+  /**
+  * @brief : keeps track of how much time has passed seans the last time the boid has slowed down 
+  */
+  float m_lastMomentumUpdate;
 
   /**
   * @brief : the radius for the boid in the flocking behavior.
   */
   float m_separationRadius;
 
- private:
+private:
   /**
   * @brief : give each boid a unique id.
   */
   uint32_t m_id; 
 
 public:
-  /**
-  * @brief : used to know if the boid is a wandering state.
-  */
-  bool is_wandering = false;
 
+  /**
+  * @brief : controls how the force is applied each frame.
+  */
   enum class ForceAplication
   {
     Normal = 0,
     Wander = 1
   };
+
+  bool is_Wandering = false;
 
   ForceAplication m_forceAplication = ForceAplication::Normal;
 };

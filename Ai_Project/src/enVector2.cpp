@@ -172,7 +172,7 @@ enVector2::Projection(const enVector2& other) const
 }
 
 float
-enVector2::getAngle()
+enVector2::getAngle() const
 {
   return std::atan2(Y, X);
 }

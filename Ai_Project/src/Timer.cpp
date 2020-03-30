@@ -16,12 +16,12 @@ Timer::~Timer()
 
 void Timer::StartTiming()
 {
-  m_Start = TimePointPicoSeconds::time_point::clock().now();
+  m_Start = TimePointNanoSeconds::time_point::clock().now();
 }
 
 void Timer::EndTiming()
 {
-  m_End = TimePointPicoSeconds::time_point::clock().now();
+  m_End = TimePointNanoSeconds::time_point::clock().now();
 
   m_Result = (m_End - m_Start);
 

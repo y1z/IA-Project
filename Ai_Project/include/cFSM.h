@@ -71,7 +71,7 @@ public:
   * @brief : for when a behavior needs some target
   */
   Boid* 
-  mp_target = nullptr;
+  m_pTarget = nullptr;
 
 private:
   /**

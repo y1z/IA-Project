@@ -8,23 +8,6 @@
 
 namespace sfHelp
 {
-  /**
-  * @brief : used to scale a image to a specific size.
-  * @returns :a vector which represent the new scale.
-  * @bug : no known bugs
-  */
-  static sf::Vector2f
-  ReScale(sf::Vector2u& originalScale,
-          uint32_t newSizeX,
-          uint32_t newSizeY)
-  {
-
-    float xScale = newSizeX / (float)originalScale.x;;
-    float yScale = newSizeY / (float)originalScale.y;;
-
-    return sf::Vector2f(xScale, yScale);
-  }
-
 
   /**
   * @brief : changes the size of the sprite
@@ -35,16 +18,16 @@ namespace sfHelp
          uint32_t newSizeX,
          uint32_t newSizeY)
   {
-    sf::IntRect originalSize = sprite.getTextureRect();
+    sf::IntRect const originalSize = sprite.getTextureRect();
 
-    float reprocipicalX = 1.0f / static_cast<float>(originalSize.width);
-    float reprocipicalY = 1.0f / static_cast<float>(originalSize.height);
+    float const reprocipicalX = 1.0f / static_cast<float>(originalSize.width);
+    float const reprocipicalY = 1.0f / static_cast<float>(originalSize.height);
 
 
-    sf::Vector2f originalScale = sprite.getScale();
+    sf::Vector2f const originalScale = sprite.getScale();
 
-    float xScale = newSizeX * reprocipicalX * static_cast<float>(originalScale.x);
-    float yScale = newSizeY * reprocipicalY * static_cast<float>(originalScale.y);
+    float const xScale = newSizeX * reprocipicalX * static_cast<float>(originalScale.x);
+    float const yScale = newSizeY * reprocipicalY * static_cast<float>(originalScale.y);
 
     sprite.setScale(xScale, yScale);
   }
@@ -87,9 +70,9 @@ namespace sfHelp
                float radius = 100.0f)
   {
     sf::CircleShape result(radius);
-    //sf::Vector2f circulOrigin = result.getOrigin();
-    //result.setOrigin(circulOrigin.x * .5f,
-    //                 circulOrigin.y * .5f);
+    sf::IntRect const circulOrigin = result.getTextureRect();
+    result.setOrigin(circulOrigin.width * .5f,
+                     circulOrigin.height * .5f); 
 
     result.setPosition(ConvertToSfmlVector(Point));
 
@@ -97,6 +80,13 @@ namespace sfHelp
     return result;
   }
 
+  /**
+  * @brief : generates a value from the range (minimum ... maximum)
+  * @return : a value from the range (minimum ... maximum)
+  * param[in] minimum : the minimum return value.
+  * param[in] maximum : the maximum return value.
+  * @bug : no known bugs
+  */
   static int32_t 
   RandIntRange(int32_t minimum, int32_t maximum)
   {
@@ -107,10 +97,37 @@ namespace sfHelp
       isSeeded = true;
     }
 
-    int32_t const range = maximum - minimum;
+    int32_t const difference = std::max(maximum, minimum) - std::min(maximum, minimum);
     float const percentage = (rand()) / static_cast<float>(RAND_MAX);
 
-    return minimum + (range * percentage);
+    return minimum + (difference * percentage);
+  }
+
+  /**
+  * @brief : generates a value from the range (minimum ... maximum)
+  * @return : a value from the range (minimum ... maximum)
+  * param[in] minimum : the minimum return value.
+  * param[in] maximum : the maximum return value.
+  * @bug : no known bugs
+  */
+  static float 
+  RandFloatRange(float minimum,float maximum)
+  {
+    static bool isSeeded = false;
+    static std::mt19937 numberGenerator;
+
+    if( isSeeded == false )
+    {
+      std::random_device rd;
+      std::seed_seq const seeds = { rd(),rd(),rd(),rd(),rd(),rd() };
+      numberGenerator.seed(seeds);
+      isSeeded = true;
+    }
+
+    float const differenceBetweenValues = std::max(maximum, minimum) - std::min(maximum, minimum);
+    float const percentage = numberGenerator() / static_cast<float>(numberGenerator.max());
+
+    return minimum + (differenceBetweenValues * percentage);
   }
 
 }

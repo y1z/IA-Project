@@ -30,14 +30,13 @@ WanderState::update(float elapsedTime)
 
   bool const AlreadyExist = this->checkForID(boid);
 
-  if( boid->m_wanderTime <= 0.0f && !AlreadyExist )
+  if( boid->m_wanderTimeTotal <= 0.0f && !AlreadyExist )
   {
-    force = Boid::wanderForce(*boid,
-                              descriptor->m_magnitude,
-                              descriptor->m_angle,
-                              descriptor->m_circleRadius,
-                              descriptor->m_perditionTime,
-                              descriptor->m_wanderingTime);
+    force = boid->wanderBehavior(descriptor->m_magnitude,
+                                 descriptor->m_angle,
+                                 descriptor->m_circleRadius,
+                                 descriptor->m_perditionTime,
+                                 descriptor->m_wanderingTime);
 
     addForceAndID(force, boid->getID());
 
@@ -47,13 +46,13 @@ WanderState::update(float elapsedTime)
   {
     force = findForceByID(boid->getID());
     boid->addForce(force);
-    if(boid->m_wanderTime <= 0.000001f )
+    if(boid->m_wanderTimeTotal <= 0.000001f )
     {
       m_actor->boidState = stateFlags::idle;
     }
   }
 
-  boid->m_wanderTime -= elapsedTime;
+  boid->m_wanderTimeTotal -= elapsedTime;
   boid->update(elapsedTime);
   return  m_actor->boidState;
 }

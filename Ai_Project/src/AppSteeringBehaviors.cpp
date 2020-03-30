@@ -16,26 +16,36 @@ static constexpr uint32_t s_totalBoids = 5u;
 bool
 AppSteeringBehaviors::init()
 {
-  mp_target = new Boid(200, 200);
-  mp_window = new sf::RenderWindow(sf::VideoMode(2000, 2000),
+  m_pTarget = new Boid(200, 200);
+  m_pWindow = new sf::RenderWindow(sf::VideoMode(2000, 2000),
                                      " Boids behaviors ");
-  mp_timer = new Timer();
-  mp_fsm = new cFSM();
+  m_pTimer = new Timer();
+  m_pFsm = new cFSM();
 
-  m_grid = std::make_unique<enGrid>();
+  m_pPlayer = std::make_unique<Boid>();
 
-  m_grid->init(30,30,5000.f,5000.f);
+  m_pGrid = std::make_unique<enGrid>();
+
+  m_pRoom = std::make_unique<enRoom>();
+
+  m_pRoom->readFile("../resources/maps/level_1.txt");
+
+  m_pGrid->init(30,30,5000.f,5000.f);
 
 
   if( !this->createAllBoids() )
     return false;
 
-  mp_fsm->init(m_boids, mp_target);
+  m_pFsm->init(m_boids, m_pTarget);
 
   for( size_t i = 1; i < 5 + 1; ++i )
   {
-    m_nodes.addNode(enPathNode(enVector2(std::cosf(i * gvars::quarterPi) * 1000.0f,
-                    1000.0f * sinf(i * gvars::quarterPi))));//quarter
+    enPathNode node;
+    node.m_position.X = std::cosf(i * gvars::quarterPi) * 1000.0f;
+    node.m_position.Y = std::sinf(i * gvars::quarterPi) * 1000.0f;
+    node.m_radius = 130.f;
+
+    m_nodes.addNode( (node));//quarter
   }
 
 
@@ -43,6 +53,8 @@ AppSteeringBehaviors::init()
     return false;
 
 
+  if( !this->setUpPlayer() )
+      return false;
 
   return true;
 }
@@ -50,38 +62,44 @@ AppSteeringBehaviors::init()
 int
 AppSteeringBehaviors::run()
 {
-  while( mp_window->isOpen() )
+  while( m_pWindow->isOpen() )
   {
-    mp_window->clear();
-    mp_timer->StartTiming();
+    m_pWindow->clear();
+    m_pTimer->StartTiming();
 
     this->windowEvents();
 
-    this->m_grid->drawGrid(*mp_window);
-    //const float FrameTime = mp_timer->GetResultSecondsFloat();
 
-    //this->mp_fsm->executeMachine(FrameTime);
+    for( Boid& boid : m_boids )
+    {
+      boid.seek(m_pTarget->getPosition(),1.0f);
+    }
 
-    //m_boids[i].m_sprite.setPosition(m_boids[i].m_position.X, m_boids[i].m_position.Y);
+    m_pRoom->draw(*m_pWindow);
 
-    //for( Boid& boid : m_boids )
-    //{
+    for( Boid& boid : m_boids )
+    {
+      m_pWindow->draw(boid.m_sprite);
+      m_pWindow->draw(sfHelp::CreateVisualLine(boid.getPosition(),
+                        boid.getPrevForce(),
+                        100.0f));
+    }
+    m_pWindow->draw(m_pPlayer->m_sprite);
 
-    //  mp_window->draw(boid.m_sprite);
-    //  mp_window->draw(sfHelp::CreateVisualLine(boid.getPosition(),
-    //                    boid.getPrevForce(),
-    //                    500.0f));
-    //}
+    m_pWindow->draw(sfHelp::CreateVisualLine(m_pPlayer->getPosition(),
+                    m_pPlayer->getPrevForce(),
+                    100.0f));
 
     //for( size_t i = 0; i < m_nodes.getSize(); i++ )
     //{
     //  enPathNode* ptrToNode = m_nodes.getPtr(i);
-    //  mp_window->draw(sfHelp::CreateCircle(ptrToNode->m_position));
+    //  m_pWindow->draw(sfHelp::CreateCircle(ptrToNode->m_position));
     //}
 
-    mp_window->display();
+    m_pTimer->EndTiming();
 
-    mp_timer->EndTiming();
+    update(m_pTimer->GetResultSecondsFloat());
+    m_pWindow->display();
   }
 
   return 0;
@@ -90,31 +108,45 @@ AppSteeringBehaviors::run()
 void
 AppSteeringBehaviors::destroy()
 {
-  if( mp_target != nullptr )
+  if( m_pTarget != nullptr )
   {
-    delete mp_target;
-    mp_target = nullptr;
+    delete m_pTarget;
+    m_pTarget = nullptr;
   }
 
-  if( mp_window != nullptr )
+  if( m_pWindow != nullptr )
   {
-    delete  mp_window;
-    mp_window = nullptr;
+    delete  m_pWindow;
+    m_pWindow = nullptr;
   }
 
-  if( mp_timer != nullptr )
+  if( m_pTimer != nullptr )
   {
-    delete mp_timer;
-    mp_timer = nullptr;
+    delete m_pTimer;
+    m_pTimer = nullptr;
   }
 
-  if( mp_fsm != nullptr )
+  if( m_pFsm != nullptr )
   {
-    delete mp_fsm;
-    mp_fsm = nullptr;
+    delete m_pFsm;
+    m_pFsm = nullptr;
   }
 
 }
+
+bool 
+AppSteeringBehaviors::update(float elapsedTime)
+{
+  for( Boid& boid : m_boids )
+  {
+    boid.update(elapsedTime);
+  }
+
+  m_pPlayer->update(elapsedTime);
+
+  return true;
+}
+
 
 bool
 AppSteeringBehaviors::createAllBoids()
@@ -138,17 +170,41 @@ AppSteeringBehaviors::setAllBoids()
     {
       return false;
     }
-    boid.setSpeed(100.0f);
     boid.m_sprite.setColor(sf::Color(100, 100, 100, 255));
 
-    sf::Vector2u sizeOfSprite = boid.m_texture.getSize();
+    sf::Vector2u const sizeOfSprite = boid.m_texture.getSize();
 
     boid.m_sprite.setOrigin(sizeOfSprite.x / 2,
                             sizeOfSprite.y / 2);
 
-    boid.setPosition(mp_window->getSize().x / 6 + Difference, mp_window->getSize().y / 2);
+    boid.setPosition(m_pWindow->getSize().x / 6 + Difference, m_pWindow->getSize().y / 2);
     sfHelp::Resize(boid.m_sprite, s_minimumWidth * 5u, s_minimumHeight * 5u);
     Difference += s_minimumWidth * 5u * 2;
+  }
+
+  return true;
+}
+
+bool 
+AppSteeringBehaviors::setUpPlayer()
+{
+  if(!m_pPlayer->loadSprite("../resources/sprites/S_generic_boid.png") )
+  {
+    return false;
+  }
+  else
+  {
+    m_pPlayer->m_sprite.setColor(sf::Color::Red);
+    m_pPlayer->setPosition(0.0f, 0.0f);
+    m_pPlayer->m_maxForce = 1.0f;
+    m_pPlayer->setSpeed(30.0f);
+
+    sf::Vector2u const sizeOfSprite = m_pPlayer->m_texture.getSize();
+
+    m_pPlayer->m_sprite.setOrigin(sizeOfSprite.x * 0.5f,
+                                  sizeOfSprite.y * 0.5f);
+
+    sfHelp::Resize(m_pPlayer->m_sprite, s_minimumWidth * 5u, s_minimumHeight * 5u);
   }
 
   return true;
@@ -159,10 +215,10 @@ AppSteeringBehaviors::windowEvents()
 {
 
   sf::Event windowEvent;
-  while( mp_window->pollEvent(windowEvent) )
+  while( m_pWindow->pollEvent(windowEvent) )
   {
     if( windowEvent.type == sf::Event::Closed )
-      mp_window->close();
+      m_pWindow->close();
 
     if( windowEvent.type == sf::Event::Resized )
     {
@@ -171,54 +227,73 @@ AppSteeringBehaviors::windowEvents()
                                         windowEvent.size.height,
                                         windowEvent.size.width);
 
-      mp_window->setView(sf::View(newWindowSize));
+      m_pWindow->setView(sf::View(newWindowSize));
     }
 
     if( windowEvent.type == sf::Event::MouseButtonPressed )
     {
-      sf::Vector2i const MousePosition = sf::Mouse::getPosition(*mp_window);
+      sf::Vector2i const MousePosition = sf::Mouse::getPosition(*m_pWindow);
 
-      sf::Vector2f const worldPosition = mp_window->mapPixelToCoords(MousePosition);
+      sf::Vector2f const worldPosition = m_pWindow->mapPixelToCoords(MousePosition);
 
-      mp_target->setPosition(worldPosition.x, worldPosition.y);
+      m_pTarget->setPosition(worldPosition.x, worldPosition.y);
     }
 
     if( windowEvent.type == sf::Event::KeyPressed )
     {
-      sf::View currentViewPort = mp_window->getView();
+      sf::View currentViewPort = m_pWindow->getView();
 
       if( windowEvent.key.code == sf::Keyboard::W )
       {
         currentViewPort.move(sf::Vector2f(0.0f, -100.0f));
-        mp_window->setView(currentViewPort);
+        m_pWindow->setView(currentViewPort);
       }
       if( windowEvent.key.code == sf::Keyboard::S )
       {
         currentViewPort.move(sf::Vector2f(0.0f, 100.0f));
-        mp_window->setView(currentViewPort);
+        m_pWindow->setView(currentViewPort);
       }
       if( windowEvent.key.code == sf::Keyboard::A )
       {
         currentViewPort.move(sf::Vector2f(-100.0f, 0.0f));
-        mp_window->setView(currentViewPort);
+        m_pWindow->setView(currentViewPort);
       }
       if( windowEvent.key.code == sf::Keyboard::D )
       {
         currentViewPort.move(sf::Vector2f(100.0f, 0.0f));
-        mp_window->setView(currentViewPort);
+        m_pWindow->setView(currentViewPort);
       }
       if( windowEvent.key.code == sf::Keyboard::R )
       {
         enVector2 Position = m_boids[0].m_position;
         sf::Vector2 const sfmlPosition = sfHelp::ConvertToSfmlVector(Position);
         currentViewPort.setCenter(sfmlPosition);
-        mp_window->setView(currentViewPort);
+        m_pWindow->setView(currentViewPort);
       }
       if( windowEvent.key.code == sf::Keyboard::LControl )
       {
-        mp_window->setView(mp_window->getDefaultView());
+        m_pWindow->setView(m_pWindow->getDefaultView());
       }
 
+      if( windowEvent.key.code == sf::Keyboard::Left )
+      {
+        m_pPlayer->seek(m_pPlayer->getPosition() + enVector2::westVector, 3.0f);
+      }
+
+      if( windowEvent.key.code == sf::Keyboard::Right )
+      {
+        m_pPlayer->seek(m_pPlayer->getPosition() + enVector2::eastVector, 3.0f);
+      }
+
+      if( windowEvent.key.code == sf::Keyboard::Up)
+      {
+        m_pPlayer->seek(m_pPlayer->getPosition() + enVector2::northVector, 3.0f);
+      }
+
+      if( windowEvent.key.code == sf::Keyboard::Down)
+      {
+        m_pPlayer->seek(m_pPlayer->getPosition() + enVector2::southVector, 3.0f);
+      }
 
     }
 
