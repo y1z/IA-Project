@@ -14,8 +14,8 @@ static uint32_t s_idCount = 0u;
 Boid::Boid()
   :m_position(enVector2::zeroVector),
   m_prevForce(enVector2::northVector),
-  m_speed(60.0f),
-  m_maxForce(1.8f),
+  m_speed(100.0f),
+  m_maxForce(4.8f),
   m_acceleration(1.0f),
   m_mass(0.7f),
   m_wanderTimeTotal(0.0f),

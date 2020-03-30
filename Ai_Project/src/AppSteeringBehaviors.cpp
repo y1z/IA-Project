@@ -144,6 +144,12 @@ AppSteeringBehaviors::update(float elapsedTime)
 
   m_pPlayer->update(elapsedTime);
 
+  sf::View currentView = m_pWindow->getView();
+
+  sf::Vector2 const sfmlPosition = sfHelp::ConvertToSfmlVector(m_pPlayer->getPosition());
+  currentView.setCenter(sfmlPosition);
+  m_pWindow->setView(currentView);
+
   return true;
 }
 
@@ -196,8 +202,8 @@ AppSteeringBehaviors::setUpPlayer()
   {
     m_pPlayer->m_sprite.setColor(sf::Color::Red);
     m_pPlayer->setPosition(0.0f, 0.0f);
-    m_pPlayer->m_maxForce = 1.0f;
-    m_pPlayer->setSpeed(30.0f);
+    m_pPlayer->m_maxForce = 4.0f;
+    m_pPlayer->setSpeed(100.0f);
 
     sf::Vector2u const sizeOfSprite = m_pPlayer->m_texture.getSize();
 

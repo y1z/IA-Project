@@ -2,7 +2,7 @@
 #include "enVector2.h"
 #include "helper.h"
 
-static constexpr const char* s_validChars = "0123456789.";
+static constexpr const char* s_validChars = "0123456789.-";
 
 bool
 enMapReader::CheckForNumberChar(char possibleNumber)
